@@ -7,6 +7,7 @@ const multer     = require('multer');
 const sharp      = require('sharp');
 const rateLimit  = require('express-rate-limit');
 const { getDb, ensureUniqueSlug, ensureUniqueAdSlug } = require('../db');
+const { notify } = require('../lib/telegram');
 
 const adLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
@@ -191,6 +192,15 @@ router.post('/propose', (req, res) => {
     contact_info: (contact_info || '').trim(),
   });
 
+  notify(
+    `🏪 <b>Nueva propuesta de negocio</b>\n` +
+    `<b>Nombre:</b> ${name.trim()}\n` +
+    (categories   ? `<b>Rubro:</b> ${categories.trim()}\n`   : '') +
+    (address      ? `<b>Dirección:</b> ${address.trim()}\n`  : '') +
+    (contact_name ? `<b>Quien escribe:</b> ${contact_name.trim()}\n` : '') +
+    `<b>Contacto:</b> ${contact_info.trim()}`
+  );
+
   res.json({ ok: true });
 });
 
@@ -220,6 +230,14 @@ router.post('/report', reportLimiter, (req, res) => {
     message:       message.trim(),
     contact_info:  (contact_info || '').trim(),
   });
+
+  notify(
+    `🚩 <b>Nuevo reporte</b>\n` +
+    `<b>Negocio:</b> ${business_name.trim()}\n` +
+    `<b>Tipo:</b> ${type.trim()}\n` +
+    `<b>Mensaje:</b> ${message.trim()}\n` +
+    (contact_info ? `<b>Contacto:</b> ${contact_info.trim()}` : '')
+  );
 
   res.json({ ok: true });
 });
@@ -299,6 +317,15 @@ router.post('/ads', adLimiter, (req, res, next) => {
     contact_info: (contact_info || '').trim().slice(0, 200),
     expires_at:   cleanExpiry,
   });
+
+  notify(
+    `📌 <b>Nuevo anuncio en comunidad</b>\n` +
+    `<b>Título:</b> ${title.trim()}\n` +
+    `<b>Duración:</b> ${durationHours}hs (vence ${cleanExpiry})\n` +
+    (description  ? `<b>Desc:</b> ${description.trim().slice(0, 120)}\n` : '') +
+    (contact_info ? `<b>Contacto:</b> ${contact_info.trim()}` : '') +
+    `\n🔗 ushuaialocal.com/anuncio/${slug}`
+  );
 
   res.json({ ok: true });
 });
