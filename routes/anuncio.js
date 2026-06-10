@@ -23,7 +23,6 @@ function esc(str) {
 // GET /anuncio/:slug
 router.get('/:slug', (req, res) => {
   const slug = req.params.slug;
-  console.log(`[anuncio] request — slug="${slug}" date="${new Date().toISOString()}"`);
   if (!slug) return res.redirect('/');
 
   const ad = getDb().prepare(`
@@ -32,10 +31,7 @@ router.get('/:slug', (req, res) => {
     WHERE slug = ? AND status = 'active' AND expires_at >= date('now')
   `).get(slug);
 
-  if (!ad) {
-    console.log(`[anuncio] not found — slug="${slug}"`);
-    return res.redirect('/');
-  }
+  if (!ad) return res.redirect('/');
 
   const base      = `${req.protocol}://${req.get('host')}`;
   const ogUrl     = `${base}/anuncio/${ad.slug}`;
@@ -61,7 +57,7 @@ router.get('/:slug', (req, res) => {
   const bodyInject = `<script id="__ad__" type="application/json">${adJson}</script>`;
 
   let html;
-  try { html = getTemplate(); } catch (e) { console.error('[anuncio] getTemplate error:', e.message); return res.redirect('/'); }
+  try { html = getTemplate(); } catch { return res.redirect('/'); }
 
   html = html
     .replace(/<title>[^<]*<\/title>/, `<title>${esc(pageTitle)}</title>`)
