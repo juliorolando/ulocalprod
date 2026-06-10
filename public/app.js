@@ -709,7 +709,7 @@ function renderAds(ads) {
     <article class="ad-card" data-id="${ad.id}" role="listitem" tabindex="0" aria-label="${esc(ad.title)}">
       <img src="${esc(ad.image_path)}" alt="${esc(ad.title)}" loading="lazy">
       <div class="ad-card-overlay"><span class="ad-card-title">${esc(ad.title)}</span></div>
-      ${ad.views > 0 ? `<span class="ad-views-badge">${ICON.eye}${ad.views}</span>` : ''}
+      ${ad.views >= 50 ? `<span class="ad-views-badge">${ICON.eye}${ad.views}</span>` : ''}
       ${ad.featured    ? `<span class="ad-featured-badge">⭐</span>` : ''}
     </article>`).join('');
 
@@ -731,15 +731,17 @@ function openAd(ad) {
   // Registrar vista y actualizar badge
   fetch(`/api/ads/${ad.id}/view`, { method: 'POST' }).then(() => {
     ad.views = (ad.views || 0) + 1;
-    const card = document.querySelector(`.ad-card[data-id="${ad.id}"]`);
-    if (card) {
-      let badge = card.querySelector('.ad-views-badge');
-      if (!badge) {
-        badge = document.createElement('span');
-        badge.className = 'ad-views-badge';
-        card.appendChild(badge);
+    if (ad.views >= 50) {
+      const card = document.querySelector(`.ad-card[data-id="${ad.id}"]`);
+      if (card) {
+        let badge = card.querySelector('.ad-views-badge');
+        if (!badge) {
+          badge = document.createElement('span');
+          badge.className = 'ad-views-badge';
+          card.appendChild(badge);
+        }
+        badge.innerHTML = `${ICON.eye}${ad.views}`;
       }
-      badge.innerHTML = `${ICON.eye}${ad.views}`;
     }
   }).catch(() => {});
 
