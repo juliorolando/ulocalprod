@@ -26,7 +26,7 @@ app.use(helmet({
       styleSrc:    ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
       fontSrc:     ["'self'", 'https://fonts.gstatic.com'],
       imgSrc:      ["'self'", 'data:', 'https:'],
-      connectSrc:  ["'self'", 'https://cloud.umami.is'],
+      connectSrc:  ["'self'", 'https://cloud.umami.is', 'https://gateway.umami.is'],
       frameAncestors: ["'none'"],
       objectSrc:   ["'none'"],
     },
