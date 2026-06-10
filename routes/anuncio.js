@@ -62,6 +62,8 @@ router.get('/:slug', (req, res) => {
   html = html
     .replace(/<title>[^<]*<\/title>/, `<title>${esc(pageTitle)}</title>`)
     .replace(/(<meta\s+name="description"\s+content=")[^"]*(")/,`$1${esc(metaDesc)}$2`)
+    .replace(/<meta\s+property="og:[^"]*"[^>]*>/g, '')
+    .replace(/<meta\s+name="twitter:[^"]*"[^>]*>/g, '')
     .replace('</head>', `${headInject}\n</head>`)
     .replace('</body>', `${bodyInject}\n</body>`);
 

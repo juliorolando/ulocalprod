@@ -40,7 +40,8 @@ router.get('/:slug', (req, res) => {
   // ── Meta content ──────────────────────────────────────────────────────────
   const catStr  = biz.categories.slice(0, 2).join(', ');
   const addr    = (biz.address || '').replace(/,?\s*Argentina\s*$/i, '').trim();
-  const ogUrl   = `${req.protocol}://${req.get('host')}/negocio/${biz.slug}`;
+  const base    = process.env.APP_URL || `${req.protocol}://${req.get('host')}`;
+  const ogUrl   = `${base}/negocio/${biz.slug}`;
 
   const pageTitle = `${biz.name}${catStr ? ' — ' + catStr : ''} en Ushuaia | Ushuaia Local`;
 
@@ -74,11 +75,18 @@ router.get('/:slug', (req, res) => {
   // ── Inject into index.html ────────────────────────────────────────────────
   const bizJson = JSON.stringify(biz).replace(/</g, '\\u003c');
 
+  const ogImage = `${base}/ulocal.png`;
+
   const headInject = `
   <meta property="og:title"       content="${esc(pageTitle)}">
   <meta property="og:description" content="${esc(metaDesc)}">
   <meta property="og:type"        content="place">
   <meta property="og:url"         content="${esc(ogUrl)}">
+  <meta property="og:image"       content="${esc(ogImage)}">
+  <meta property="twitter:card"        content="summary">
+  <meta property="twitter:title"       content="${esc(pageTitle)}">
+  <meta property="twitter:description" content="${esc(metaDesc)}">
+  <meta property="twitter:image"       content="${esc(ogImage)}">
   <link rel="canonical"           href="${esc(ogUrl)}">
   <script type="application/ld+json">${JSON.stringify(schema)}</script>`;
 
@@ -105,10 +113,9 @@ router.get('/:slug', (req, res) => {
 
   html = html
     .replace(/<title>[^<]*<\/title>/, `<title>${esc(pageTitle)}</title>`)
-    .replace(
-      /(<meta\s+name="description"\s+content=")[^"]*(")/,
-      `$1${esc(metaDesc)}$2`
-    )
+    .replace(/(<meta\s+name="description"\s+content=")[^"]*(")/,`$1${esc(metaDesc)}$2`)
+    .replace(/<meta\s+property="og:[^"]*"[^>]*>/g, '')
+    .replace(/<meta\s+name="twitter:[^"]*"[^>]*>/g, '')
     .replace('</head>', `${headInject}\n</head>`)
     .replace('</body>', `${bodyInject}\n</body>`);
 
