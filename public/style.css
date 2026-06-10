@@ -87,6 +87,20 @@ body {
   justify-content: center;
   flex-shrink: 0;
 }
+.logo-img {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  object-fit: cover;
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.35);
+}
+.footer-logo-img {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  box-shadow: none;
+}
 
 .brand-name {
   font-family: var(--font-head);

@@ -134,10 +134,17 @@ function initDb() {
 
   const { count } = database.prepare('SELECT COUNT(*) as count FROM businesses').get();
   if (count === 0) {
-    console.log('[db] Migrando datos desde local_results...');
-    migrateFromScrape(database);
-    const { count: imported } = database.prepare('SELECT COUNT(*) as count FROM businesses').get();
-    console.log(`[db] Migracion completa: ${imported} negocios importados.`);
+    const hasSource = database.prepare(
+      "SELECT name FROM sqlite_master WHERE type='table' AND name='local_results'"
+    ).get();
+    if (hasSource) {
+      console.log('[db] Migrando datos desde local_results...');
+      migrateFromScrape(database);
+      const { count: imported } = database.prepare('SELECT COUNT(*) as count FROM businesses').get();
+      console.log(`[db] Migracion completa: ${imported} negocios importados.`);
+    } else {
+      console.log('[db] Base de datos lista (vacía, sin datos previos para migrar).');
+    }
   } else {
     console.log(`[db] Base de datos lista: ${count} negocios.`);
   }

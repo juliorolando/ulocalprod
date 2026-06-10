@@ -6,7 +6,9 @@
       "Bash(npm install *)",
       "Bash(PORT=3001 node server.js)",
       "Bash(curl -sI http://localhost:3001/)",
-      "Bash(node *)"
+      "Bash(node *)",
+      "PowerShell(Add-Type -AssemblyName System.Drawing; $ico = [System.Drawing.Icon]::new\\(\"C:\\\\Users\\\\NetCell\\\\Desktop\\\\Nevado LAB\\\\Code Vibing Factory\\\\monopolioushuaialocal\\\\favicon.ico\"\\); \"ICO Size: $\\($ico.Width\\)x$\\($ico.Height\\)\"; $ico.Dispose\\(\\))",
+      "PowerShell(Add-Type -AssemblyName System.Drawing; $png = [System.Drawing.Image]::FromFile\\(\"C:\\\\Users\\\\NetCell\\\\Desktop\\\\Nevado LAB\\\\Code Vibing Factory\\\\monopolioushuaialocal\\\\ulocal.png\"\\); \"PNG Size: $\\($png.Width\\)x$\\($png.Height\\)\"; $png.Dispose\\(\\))"
     ]
   }
 }
