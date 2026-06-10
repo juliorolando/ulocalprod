@@ -972,7 +972,7 @@ body {
   width: 100%;
   overflow: hidden;
   border-radius: var(--radius-card) var(--radius-card) 0 0;
-  background: #111;
+  background: var(--surface);
 }
 .ad-dmodal-img-wrap img {
   width: 100%;
