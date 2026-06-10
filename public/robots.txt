@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api
+Disallow: /telegram-webhook
+
+Sitemap: https://ushuaialocal.com/sitemap.xml

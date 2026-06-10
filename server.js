@@ -86,6 +86,8 @@ app.use('/api/propose',  proposeLimiter);
 app.use('/api',          apiLimiter);
 
 // ── Rutas ────────────────────────────────────────────────────────────────────
+app.use('/',        require('./routes/home'));
+app.use('/sitemap.xml', require('./routes/sitemap'));
 app.use('/negocio', require('./routes/negocio'));
 app.use('/anuncio', require('./routes/anuncio'));
 

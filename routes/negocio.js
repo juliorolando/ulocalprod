@@ -104,10 +104,7 @@ router.get('/:slug', (req, res) => {
   }
 
   html = html
-    .replace(
-      '<title>Ushuaia Local — Directorio de negocios</title>',
-      `<title>${esc(pageTitle)}</title>`
-    )
+    .replace(/<title>[^<]*<\/title>/, `<title>${esc(pageTitle)}</title>`)
     .replace(
       /(<meta\s+name="description"\s+content=")[^"]*(")/,
       `$1${esc(metaDesc)}$2`

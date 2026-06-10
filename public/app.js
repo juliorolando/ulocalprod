@@ -35,6 +35,13 @@ const EMBEDDED_BIZ = (() => {
   try { return JSON.parse(el.textContent); } catch { return null; }
 })();
 
+/* ── Init data island (SSR pre-loaded businesses + categories for main page) ─── */
+const INIT_DATA = (() => {
+  const el = document.getElementById('__init__');
+  if (!el) return null;
+  try { return JSON.parse(el.textContent); } catch { return null; }
+})();
+
 /* ── Embedded ad (for /anuncio/:slug pages) ─────────────────────────────────── */
 const EMBEDDED_AD = (() => {
   const el = document.getElementById('__ad__');
@@ -788,6 +795,16 @@ document.getElementById('ad-modal-share').addEventListener('click', async () => 
   setTimeout(() => { btn.innerHTML = orig; }, 2000);
 });
 
+document.getElementById('detail-share').addEventListener('click', async () => {
+  if (!currentDetailBiz?.slug) return;
+  const url = `${location.origin}/negocio/${currentDetailBiz.slug}`;
+  const btn = document.getElementById('detail-share');
+  await navigator.clipboard.writeText(url).catch(() => {});
+  const orig = btn.innerHTML;
+  btn.textContent = '¡Link copiado!';
+  setTimeout(() => { btn.innerHTML = orig; }, 2000);
+});
+
 /* ── Propose-ad modal ───────────────────────────────────────────────────────── */
 let selectedAdDuration = 24;
 
@@ -957,8 +974,8 @@ async function init() {
   if (EMBEDDED_AD)  openAd(EMBEDDED_AD);
 
   const [businesses, categories, ads, ticker] = await Promise.all([
-    fetch('/api/businesses').then(r => r.json()),
-    fetch('/api/categories').then(r => r.json()),
+    INIT_DATA?.businesses ? Promise.resolve(INIT_DATA.businesses) : fetch('/api/businesses').then(r => r.json()),
+    INIT_DATA?.categories ? Promise.resolve(INIT_DATA.categories) : fetch('/api/categories').then(r => r.json()),
     fetch('/api/ads').then(r => r.json()),
     fetch('/api/ticker').then(r => r.json()).catch(() => []),
   ]);
