@@ -136,6 +136,30 @@ body {
 
 .btn-small { padding: 0.35rem 0.9rem; font-size: 0.82rem; }
 .btn-full { width: 100%; justify-content: center; }
+.btn-danger { background: #dc2626; color: #fff; border-color: #dc2626; }
+.btn-danger:hover { background: #b91c1c; border-color: #b91c1c; }
+
+/* ── Ticker admin ─────────────────────────────────────────────────────────── */
+.ticker-add-form {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 1.25rem;
+}
+.ticker-add-form .form-input { flex: 1; }
+.ticker-admin-list { display: flex; flex-direction: column; gap: 0.5rem; }
+.ticker-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.65rem 1rem;
+}
+.ticker-row--off { opacity: 0.45; }
+.ticker-row-text { font-size: 0.88rem; color: var(--text); flex: 1; }
+.ticker-row-actions { display: flex; gap: 0.4rem; flex-shrink: 0; }
 
 /* Row action buttons (used by admin.js renderTable) */
 .btn-edit, .btn-delete {

@@ -87,6 +87,7 @@ app.use('/api',          apiLimiter);
 
 // ── Rutas ────────────────────────────────────────────────────────────────────
 app.use('/negocio', require('./routes/negocio'));
+app.use('/anuncio', require('./routes/anuncio'));
 
 // Imágenes de anuncios (sin cache agresivo para facilitar actualizaciones)
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads'), {

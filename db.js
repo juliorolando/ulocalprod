@@ -101,6 +101,14 @@ function initDb() {
       created_at    DATETIME DEFAULT CURRENT_TIMESTAMP
     );
 
+    CREATE TABLE IF NOT EXISTS ticker_messages (
+      id         INTEGER PRIMARY KEY AUTOINCREMENT,
+      text       TEXT    NOT NULL,
+      is_active  INTEGER DEFAULT 1,
+      sort_order INTEGER DEFAULT 0,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
     CREATE TABLE IF NOT EXISTS ads (
       id           INTEGER PRIMARY KEY AUTOINCREMENT,
       title        TEXT    NOT NULL,

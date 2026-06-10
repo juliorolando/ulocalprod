@@ -1,8 +1,9 @@
-let businesses  = [];
-let proposals   = [];
-let ads         = [];
-let reports     = [];
-let adsFilter   = 'pending';
+let businesses     = [];
+let proposals      = [];
+let ads            = [];
+let reports        = [];
+let tickerMessages = [];
+let adsFilter      = 'pending';
 let sortOrder   = 'name';
 let searchQuery = '';
 
@@ -66,19 +67,20 @@ function switchSection(section) {
     b.classList.toggle('active', b.dataset.section === section);
   });
 
-  const sections = ['negocios', 'propuestas', 'anuncios', 'reportes', 'estadisticas'];
+  const sections = ['negocios', 'propuestas', 'anuncios', 'reportes', 'ticker', 'estadisticas'];
   sections.forEach(s => {
     document.getElementById(`section-${s}`).classList.toggle('hidden', s !== section);
     document.getElementById(`topbar-${s}`).classList.toggle('hidden', s !== section);
   });
 
-  const titles = { negocios: 'Negocios', propuestas: 'Propuestas', anuncios: 'Anuncios', reportes: 'Reportes', estadisticas: 'Estadísticas' };
+  const titles = { negocios: 'Negocios', propuestas: 'Propuestas', anuncios: 'Anuncios', reportes: 'Reportes', ticker: 'Ticker', estadisticas: 'Estadísticas' };
   document.getElementById('section-title').textContent = titles[section] || section;
 
   if (section === 'propuestas')   loadProposals();
   if (section === 'anuncios')     loadAds();
   if (section === 'reportes')     loadReports();
   if (section === 'estadisticas') loadStats();
+  if (section === 'ticker')       loadTicker();
 }
 
 // ─── Load & render businesses ──────────────────────────────────────────────────
@@ -722,6 +724,60 @@ document.addEventListener('click', e => {
     case 'reject-ad':        rejectAd(id);           break;
     case 'delete-ad':        deleteAd(id);           break;
   }
+});
+
+// ─── Ticker ────────────────────────────────────────────────────────────────────
+
+async function loadTicker() {
+  tickerMessages = await fetch('/admin/ticker').then(r => r.json());
+  renderTickerList();
+  document.getElementById('ticker-count').textContent =
+    `${tickerMessages.filter(m => m.is_active).length} activos · ${tickerMessages.length} total`;
+}
+
+function renderTickerList() {
+  const container = document.getElementById('ticker-list');
+  if (!tickerMessages.length) {
+    container.innerHTML = '<p class="table-empty">No hay mensajes. Agregá el primero.</p>';
+    return;
+  }
+  container.innerHTML = tickerMessages.map(m => `
+    <div class="ticker-row ${m.is_active ? '' : 'ticker-row--off'}">
+      <span class="ticker-row-text">${esc(m.text)}</span>
+      <div class="ticker-row-actions">
+        <button class="btn btn-ghost btn-small" onclick="toggleTicker(${m.id})">
+          ${m.is_active ? 'Desactivar' : 'Activar'}
+        </button>
+        <button class="btn btn-danger btn-small" onclick="deleteTicker(${m.id})">Eliminar</button>
+      </div>
+    </div>`).join('');
+}
+
+async function toggleTicker(id) {
+  await fetch(`/admin/ticker/${id}/toggle`, { method: 'PATCH' });
+  loadTicker();
+}
+
+async function deleteTicker(id) {
+  if (!confirm('¿Eliminar este mensaje del ticker?')) return;
+  await fetch(`/admin/ticker/${id}`, { method: 'DELETE' });
+  loadTicker();
+}
+
+document.getElementById('ticker-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const text  = document.getElementById('ticker-text').value.trim();
+  const errEl = document.getElementById('ticker-error');
+  errEl.textContent = '';
+  const res  = await fetch('/admin/ticker', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text }),
+  });
+  const data = await res.json();
+  if (data.error) { errEl.textContent = data.error; return; }
+  document.getElementById('ticker-text').value = '';
+  loadTicker();
 });
 
 // ─── Init ──────────────────────────────────────────────────────────────────────

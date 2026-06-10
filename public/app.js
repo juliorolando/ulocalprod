@@ -35,6 +35,13 @@ const EMBEDDED_BIZ = (() => {
   try { return JSON.parse(el.textContent); } catch { return null; }
 })();
 
+/* ── Embedded ad (for /anuncio/:id pages) ───────────────────────────────────── */
+const EMBEDDED_AD = (() => {
+  const el = document.getElementById('__ad__');
+  if (!el) return null;
+  try { return JSON.parse(el.textContent); } catch { return null; }
+})();
+
 /* ── State ─────────────────────────────────────────────────────────────────── */
 let allBusinesses   = [];
 let activeCategory  = '';
@@ -691,6 +698,7 @@ function openAd(ad) {
     }
   }).catch(() => {});
 
+  _currentAdId = ad.id;
   document.getElementById('ad-modal-img').src     = ad.image_path;
   document.getElementById('ad-modal-img').alt     = ad.title;
   document.getElementById('ad-modal-title').textContent = ad.title;
@@ -728,6 +736,17 @@ document.getElementById('ad-modal').addEventListener('click', e => {
   if (e.target === e.currentTarget) closeAd();
 });
 
+let _currentAdId = null;
+document.getElementById('ad-modal-share').addEventListener('click', async () => {
+  if (!_currentAdId) return;
+  const url = `${location.origin}/anuncio/${_currentAdId}`;
+  const btn = document.getElementById('ad-modal-share');
+  await navigator.clipboard.writeText(url).catch(() => {});
+  const orig = btn.innerHTML;
+  btn.textContent = '¡Link copiado!';
+  setTimeout(() => { btn.innerHTML = orig; }, 2000);
+});
+
 /* ── Propose-ad modal ───────────────────────────────────────────────────────── */
 let selectedAdDuration = 24;
 
@@ -751,7 +770,7 @@ function openProposeAd() {
   document.getElementById('propose-ad-form').reset();
   document.getElementById('propose-ad-success').classList.add('hidden');
   document.getElementById('ad-error').textContent = '';
-  document.getElementById('ad-preview-wrap').classList.add('hidden');
+  document.getElementById('ad-preview-wrap')?.classList.add('hidden');
 
   _adTitleCount.textContent = '100 restantes';
   _adTitleCount.className   = 'char-counter';
@@ -785,10 +804,14 @@ document.getElementById('propose-ad-cancel').addEventListener('click', closeProp
 document.getElementById('ad-image').addEventListener('change', e => {
   const file = e.target.files[0];
   const wrap = document.getElementById('ad-preview-wrap');
+  if (!wrap) return;
   if (!file) { wrap.classList.add('hidden'); return; }
-  const url = URL.createObjectURL(file);
-  document.getElementById('ad-preview').src = url;
-  wrap.classList.remove('hidden');
+  const reader = new FileReader();
+  reader.onload = ev => {
+    document.getElementById('ad-preview').src = ev.target.result;
+    wrap.classList.remove('hidden');
+  };
+  reader.readAsDataURL(file);
 });
 
 document.getElementById('propose-ad-form').addEventListener('submit', async e => {
@@ -833,19 +856,43 @@ document.getElementById('propose-ad-form').addEventListener('submit', async e =>
 });
 
 /* ── Init ───────────────────────────────────────────────────────────────────── */
-async function init() {
-  // If we landed on /negocio/:slug, open that business immediately
-  if (EMBEDDED_BIZ) openDetailBiz(EMBEDDED_BIZ, false);
+/* ── Ticker ─────────────────────────────────────────────────────────────────── */
+function renderTicker(messages) {
+  if (!messages.length) return;
+  const wrap  = document.getElementById('ticker-wrap');
+  const track = document.getElementById('ticker-track');
 
-  const [businesses, categories, ads] = await Promise.all([
+  const items = messages.map(m =>
+    `<span class="ticker-item">${esc(m.text)}</span><span class="ticker-sep" aria-hidden="true">✦</span>`
+  ).join('');
+
+  // Duplicar para loop sin cortes
+  track.innerHTML = items + items;
+
+  // Velocidad proporcional al contenido (~60px/s)
+  const totalLen = messages.reduce((s, m) => s + m.text.length, 0);
+  const duration = Math.max(15, Math.round(totalLen * 0.38));
+  track.style.animationDuration = `${duration}s`;
+
+  wrap.hidden = false;
+}
+
+async function init() {
+  // Si llegamos por /negocio/:slug o /anuncio/:id, abrir directamente
+  if (EMBEDDED_BIZ) openDetailBiz(EMBEDDED_BIZ, false);
+  if (EMBEDDED_AD)  openAd(EMBEDDED_AD);
+
+  const [businesses, categories, ads, ticker] = await Promise.all([
     fetch('/api/businesses').then(r => r.json()),
     fetch('/api/categories').then(r => r.json()),
     fetch('/api/ads').then(r => r.json()),
+    fetch('/api/ticker').then(r => r.json()).catch(() => []),
   ]);
 
   allBusinesses = sortByRichness(shuffle(businesses));
   renderCategories(shuffle(categories));
   renderAds(ads);
+  renderTicker(ticker);
 
   const skeleton = document.getElementById('skeleton');
   if (skeleton) skeleton.remove();

@@ -3,13 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ushuaia Local — Directorio de negocios</title>
-  <meta name="description" content="Guía local de negocios, restaurantes, comercios y servicios de Ushuaia. Hecha por vecinos para turistas y locales.">
+  <title>Ushuaia Local — Directorio y anuncios gratuitos en Ushuaia</title>
+  <meta name="description" content="Directorio gratuito de negocios, comercios y servicios de Ushuaia. Publicá anuncios de trabajo, mascotas perdidas y eventos sin costo. El portal más austral.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/style.css">
   <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+  <!-- Open Graph -->
+  <meta property="og:type"        content="website">
+  <meta property="og:site_name"   content="Ushuaia Local">
+  <meta property="og:url"         content="https://www.ushuaialocal.com/">
+  <meta property="og:title"       content="Ushuaia Local — Directorio y anuncios gratuitos">
+  <meta property="og:description" content="Encontrá negocios locales o publicá un anuncio de trabajo, mascota perdida o evento, sin costo. El portal digital de Ushuaia, Tierra del Fuego.">
+  <meta property="og:image"              content="https://www.ushuaialocal.com/ulocal.png">
+  <meta property="og:image:secure_url"  content="https://www.ushuaialocal.com/ulocal.png">
+  <meta property="og:image:type"        content="image/png">
+  <meta property="og:image:width"       content="1024">
+  <meta property="og:image:height"      content="1024">
+  <meta property="og:image:alt"         content="Ushuaia Local">
+  <meta property="og:locale"            content="es_AR">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card"        content="summary">
+  <meta name="twitter:title"       content="Ushuaia Local — Directorio y anuncios gratuitos">
+  <meta name="twitter:description" content="Encontrá negocios locales o publicá un anuncio de trabajo, mascota perdida o evento, sin costo. El portal digital de Ushuaia, Tierra del Fuego.">
+  <meta name="twitter:image"       content="https://www.ushuaialocal.com/ulocal.png">
 </head>
 <body>
 
@@ -43,10 +63,13 @@
     </div>
   </div>
 
-  <div class="status-bar container-wide">
-    <span id="results-info" class="results-count"></span>
-    <button id="clear-filters" class="link-btn" hidden>Limpiar filtros</button>
+  <!-- Ticker -->
+  <div class="ticker-wrap" id="ticker-wrap" hidden>
+    <div class="ticker-track" id="ticker-track"></div>
   </div>
+  <!-- Elementos ocultos para compatibilidad JS -->
+  <span id="results-info" hidden></span>
+  <button id="clear-filters" hidden></button>
 
   <!-- Anuncios -->
   <section id="ads-section" class="ads-section">
@@ -68,7 +91,7 @@
       </div>
     </div>
     <div id="load-more-wrap" class="load-more-wrap" hidden>
-      <button id="load-more-btn" class="load-more-btn">Cargar más negocios</button>
+      <button id="load-more-btn" class="load-more-btn">Cargar más</button>
     </div>
   </main>
 
@@ -154,13 +177,13 @@
       <div class="pmodal-body">
         <div id="propose-success" class="pmodal-success hidden">
           <div class="pmodal-success-icon">✓</div>
-          <p><strong>¡Propuesta enviada!</strong><br>La revisamos y te contactamos a la brevedad.</p>
+          <p><strong>¡Propuesta enviada!</strong><br>Si esta todo ok, la publicaremos y te contactaremos a la brevedad.</p>
         </div>
         <form id="propose-form">
           <p class="free-badge">✓ Totalmente gratis</p>
-          <p class="pmodal-intro">Completá el formulario y revisamos tu propuesta para incluirla en el directorio.</p>
+          <p class="pmodal-intro">Completá el formulario, más datos completos mejoran tu visibilidad en el directorio.</p>
           <div class="form-group">
-            <label class="form-label" for="p-name">Nombre del negocio <span class="required">*</span></label>
+            <label class="form-label" for="p-name">Nombre del negocio/servicio <span class="required">*</span></label>
             <input type="text" id="p-name" class="form-input" required maxlength="200" placeholder="Ej: La Cantina del Fin del Mundo">
           </div>
           <div class="form-group">
@@ -172,8 +195,8 @@
             <input type="text" id="p-address" class="form-input" maxlength="300" placeholder="Ej: San Martín 845">
           </div>
           <div class="form-group">
-            <label class="form-label" for="p-phone">Teléfono</label>
-            <input type="tel" id="p-phone" class="form-input" maxlength="50" placeholder="Ej: +54 2901 123456">
+            <label class="form-label" for="p-phone">WhatsApp</label>
+            <input type="tel" id="p-phone" class="form-input" maxlength="50" placeholder="Ej: 2901554433">
           </div>
           <div class="form-group">
             <label class="form-label" for="p-website">Sitio web / Instagram / Facebook</label>
@@ -195,7 +218,7 @@
           <p class="form-error" id="p-error"></p>
           <div class="form-actions">
             <button type="button" id="propose-cancel" class="btn-muted">Cancelar</button>
-            <button type="submit" class="btn-primary-solid">Enviar propuesta</button>
+            <button type="submit" class="btn-primary-solid">Enviar</button>
           </div>
         </form>
       </div>
@@ -214,6 +237,10 @@
         <p id="ad-modal-date" class="ad-dmodal-date"></p>
         <p id="ad-modal-desc" class="ad-dmodal-desc hidden"></p>
         <p id="ad-modal-contact" class="ad-dmodal-contact hidden"></p>
+        <button id="ad-modal-share" class="ad-share-btn" aria-label="Compartir anuncio">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          Compartir
+        </button>
       </div>
     </div>
   </div>
@@ -235,7 +262,7 @@
           <p class="pmodal-intro">Tu anuncio quedará visible una vez que lo revisemos. Solo imágenes JPG, PNG o WEBP hasta 2MB.</p>
           <div class="form-group">
             <label class="form-label" for="ad-title">Título <span class="required">*</span></label>
-            <input type="text" id="ad-title" class="form-input" required maxlength="100" placeholder="Ej: 2x1 en cervezas artesanales esta noche">
+            <input type="text" id="ad-title" class="form-input" required maxlength="100" placeholder="Ej: 2x1 esta noche">
             <small class="char-counter" id="ad-title-count">100 restantes</small>
           </div>
           <div class="form-group">
@@ -267,7 +294,7 @@
             <button type="button" id="propose-ad-cancel" class="btn-muted">Cancelar</button>
             <button type="submit" class="btn-primary-solid">Enviar anuncio</button>
           </div>
-          <p class="form-help-text">¿Necesitás ayuda con tu anuncio? <a href="mailto:ushuaialocal@gmail.com">Contactanos</a></p>
+          <p class="form-help-text">¿Necesitás ayuda con tu anuncio? <a href="mailto:contacto@ushuaialocal.com">Contactanos</a></p>
         </form>
       </div>
     </div>

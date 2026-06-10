@@ -65,6 +65,10 @@
           Reportes
           <span class="nav-badge" id="reports-badge" hidden>0</span>
         </button>
+        <button class="admin-nav-link" data-section="ticker">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="9" y1="10" x2="15" y2="10"/></svg>
+          Ticker
+        </button>
         <button class="admin-nav-link" data-section="estadisticas">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
           Estadísticas
@@ -94,6 +98,9 @@
         </div>
         <div id="topbar-reportes" class="topbar-right hidden">
           <span id="reports-count" class="admin-user-badge"></span>
+        </div>
+        <div id="topbar-ticker" class="topbar-right hidden">
+          <span id="ticker-count" class="admin-user-badge"></span>
         </div>
         <div id="topbar-estadisticas" class="topbar-right hidden">
           <button id="stats-refresh-btn" class="btn btn-ghost btn-small">↻ Actualizar</button>
@@ -141,6 +148,19 @@
         <div id="section-reportes" class="hidden">
           <div id="reports-list">
             <p class="table-empty">Cargando reportes…</p>
+          </div>
+        </div>
+
+        <!-- Sección: Ticker -->
+        <div id="section-ticker" class="hidden">
+          <form id="ticker-form" class="ticker-add-form">
+            <input type="text" id="ticker-text" class="form-input" maxlength="280"
+              placeholder="Ej: 🔥 Descuento 2x1 en La Cantina este viernes — mandá tu mensaje por WhatsApp" required>
+            <button type="submit" class="btn btn-primary btn-small">Agregar</button>
+          </form>
+          <p class="form-error" id="ticker-error"></p>
+          <div id="ticker-list" class="ticker-admin-list">
+            <p class="table-empty">Cargando mensajes…</p>
           </div>
         </div>
 

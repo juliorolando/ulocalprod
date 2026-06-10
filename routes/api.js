@@ -233,6 +233,16 @@ router.post('/report', reportLimiter, (req, res) => {
   res.json({ ok: true });
 });
 
+// GET /api/ticker  (public — mensajes activos ordenados)
+router.get('/ticker', (req, res) => {
+  const rows = getDb().prepare(`
+    SELECT id, text FROM ticker_messages
+    WHERE is_active = 1
+    ORDER BY sort_order ASC, id ASC
+  `).all();
+  res.json(rows);
+});
+
 // GET /api/ads  (public — activos y no vencidos)
 router.get('/ads', (req, res) => {
   const rows = getDb().prepare(`
