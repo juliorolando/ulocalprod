@@ -4,8 +4,8 @@
   <script defer src="https://cloud.umami.is/script.js" data-website-id="eb6f1590-5e6d-41e5-9486-3aa27b50b2c8"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ushuaia Local — Directorio y anuncios gratuitos en Ushuaia</title>
-  <meta name="description" content="Directorio gratuito de negocios, comercios y servicios de Ushuaia. Publicá anuncios de trabajo, mascotas perdidas y eventos sin costo. El portal más austral.">
+  <title>Ushuaia Local — Directorio y comunidad de Ushuaia</title>
+  <meta name="description" content="Directorio gratuito de negocios, comercios y servicios de Ushuaia. Publicá promos, eventos y novedades en la comunidad. El portal más austral.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
@@ -16,8 +16,8 @@
   <meta property="og:type"        content="website">
   <meta property="og:site_name"   content="Ushuaia Local">
   <meta property="og:url"         content="https://www.ushuaialocal.com/">
-  <meta property="og:title"       content="Ushuaia Local — Directorio y anuncios gratuitos">
-  <meta property="og:description" content="Encontrá negocios locales o publicá un anuncio de trabajo, mascota perdida o evento, sin costo. El portal digital de Ushuaia, Tierra del Fuego.">
+  <meta property="og:title"       content="Ushuaia Local — Directorio y comunidad de Ushuaia">
+  <meta property="og:description" content="Encontrá negocios locales y conectate con la comunidad de Ushuaia. Publicá promos, eventos y novedades sin costo. El portal digital de Tierra del Fuego.">
   <meta property="og:image"              content="https://www.ushuaialocal.com/ulocal.png">
   <meta property="og:image:secure_url"  content="https://www.ushuaialocal.com/ulocal.png">
   <meta property="og:image:type"        content="image/png">
@@ -28,8 +28,8 @@
 
   <!-- Twitter Card -->
   <meta name="twitter:card"        content="summary">
-  <meta name="twitter:title"       content="Ushuaia Local — Directorio y anuncios gratuitos">
-  <meta name="twitter:description" content="Encontrá negocios locales o publicá un anuncio de trabajo, mascota perdida o evento, sin costo. El portal digital de Ushuaia, Tierra del Fuego.">
+  <meta name="twitter:title"       content="Ushuaia Local — Directorio y comunidad de Ushuaia">
+  <meta name="twitter:description" content="Encontrá negocios locales y conectate con la comunidad de Ushuaia. Publicá promos, eventos y novedades sin costo. El portal digital de Tierra del Fuego.">
   <meta name="twitter:image"       content="https://www.ushuaialocal.com/ulocal.png">
 </head>
 <body>
@@ -75,7 +75,7 @@
   <!-- Anuncios -->
   <section id="ads-section" class="ads-section">
     <div class="ads-header container-wide">
-      <span class="ads-label">Anuncios y novedades</span>
+      <span class="ads-label">Comunidad Ushuaia</span>
     </div>
     <div class="ads-strip container-wide" id="ads-strip" role="list"></div>
   </section>
@@ -132,9 +132,9 @@
           <span class="chooser-badge">Gratis · Permanente</span>
         </button>
         <button class="chooser-option" id="chooser-go-anuncio">
-          <span class="chooser-icon" aria-hidden="true">📢</span>
-          <strong class="chooser-name">Un anuncio</strong>
-          <p class="chooser-desc">Publicá una promo, evento, búsqueda de trabajo o cualquier novedad.</p>
+          <span class="chooser-icon" aria-hidden="true">📌</span>
+          <strong class="chooser-name">En la comunidad</strong>
+          <p class="chooser-desc">Publicá una novedad, promo, evento o búsqueda de trabajo para Ushuaia.</p>
           <span class="chooser-badge">Gratis · 24 hs a 5 días</span>
         </button>
       </div>
@@ -250,21 +250,22 @@
   <div id="propose-ad-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
     <div class="pmodal">
       <div class="pmodal-header">
-        <h2 class="pmodal-title">Publicar un anuncio</h2>
+        <h2 class="pmodal-title">Publicar en la comunidad</h2>
         <button class="dmodal-close" id="propose-ad-close" aria-label="Cerrar">&times;</button>
       </div>
       <div class="pmodal-body">
         <div id="propose-ad-success" class="pmodal-success hidden">
           <div class="pmodal-success-icon">✓</div>
-          <p><strong>¡Anuncio enviado!</strong><br>Lo revisamos y lo publicamos a la brevedad.</p>
+          <p><strong>¡Publicación enviada!</strong><br>Lo revisamos y lo publicamos a la brevedad.</p>
         </div>
         <form id="propose-ad-form" enctype="multipart/form-data">
           <p class="free-badge">✓ Totalmente gratis</p>
-          <p class="pmodal-intro">Tu anuncio quedará visible una vez que lo revisemos. Solo imágenes JPG, PNG o WEBP hasta 2MB.</p>
+          <p class="pmodal-intro">Tu publicación quedará visible una vez que la revisemos. Solo imágenes JPG, PNG o WEBP hasta 2MB.</p>
           <div class="form-group">
             <label class="form-label" for="ad-title">Título <span class="required">*</span></label>
-            <input type="text" id="ad-title" class="form-input" required maxlength="100" placeholder="Ej: 2x1 esta noche">
+            <input type="text" id="ad-title" class="form-input" required maxlength="60" placeholder="Ej: 2x1 esta noche">
             <small class="char-counter" id="ad-title-count">100 restantes</small>
+            <small class="ad-url-preview hidden" id="ad-url-preview"></small>
           </div>
           <div class="form-group">
             <label class="form-label" for="ad-image">Imagen <span class="required">*</span></label>
@@ -275,7 +276,7 @@
           </div>
           <div class="form-group">
             <label class="form-label" for="ad-description">Descripción <span class="form-hint">(opcional)</span></label>
-            <textarea id="ad-description" class="form-textarea" rows="2" maxlength="500" placeholder="Más detalles sobre el anuncio…"></textarea>
+            <textarea id="ad-description" class="form-textarea" rows="2" maxlength="500" placeholder="Más detalles sobre tu publicación…"></textarea>
             <small class="char-counter" id="ad-desc-count">500 restantes</small>
           </div>
           <div class="form-group">
@@ -284,7 +285,7 @@
           </div>
           <div class="form-group">
             <label class="form-label">Duración <span class="required">*</span></label>
-            <div class="duration-pills" role="group" aria-label="Duración del anuncio">
+            <div class="duration-pills" role="group" aria-label="Duración de la publicación">
               <button type="button" class="duration-pill active" data-hours="24">24 hs</button>
               <button type="button" class="duration-pill" data-hours="48">48 hs</button>
               <button type="button" class="duration-pill" data-hours="120">5 días</button>
@@ -293,9 +294,9 @@
           <p class="form-error" id="ad-error"></p>
           <div class="form-actions">
             <button type="button" id="propose-ad-cancel" class="btn-muted">Cancelar</button>
-            <button type="submit" class="btn-primary-solid">Enviar anuncio</button>
+            <button type="submit" class="btn-primary-solid">Enviar publicación</button>
           </div>
-          <p class="form-help-text">¿Necesitás ayuda con tu anuncio? <a href="mailto:contacto@ushuaialocal.com">Contactanos</a></p>
+          <p class="form-help-text">¿Necesitás ayuda? <a href="mailto:contacto@ushuaialocal.com">Contactanos</a></p>
         </form>
       </div>
     </div>

@@ -20,21 +20,21 @@ function esc(str) {
     .replace(/>/g, '&gt;');
 }
 
-// GET /anuncio/:id
-router.get('/:id', (req, res) => {
-  const id = parseInt(req.params.id, 10);
-  if (!id) return res.redirect('/');
+// GET /anuncio/:slug
+router.get('/:slug', (req, res) => {
+  const slug = req.params.slug;
+  if (!slug) return res.redirect('/');
 
   const ad = getDb().prepare(`
-    SELECT id, title, description, image_path, contact_info, expires_at, created_at, views
+    SELECT id, slug, title, description, image_path, contact_info, expires_at, created_at, views
     FROM ads
-    WHERE id = ? AND status = 'active' AND expires_at > date('now')
-  `).get(id);
+    WHERE slug = ? AND status = 'active' AND expires_at > date('now')
+  `).get(slug);
 
   if (!ad) return res.redirect('/');
 
   const base      = `${req.protocol}://${req.get('host')}`;
-  const ogUrl     = `${base}/anuncio/${ad.id}`;
+  const ogUrl     = `${base}/anuncio/${ad.slug}`;
   const ogImage   = `${base}${ad.image_path}`;
   const pageTitle = `${ad.title} — Ushuaia Local`;
   const metaDesc  = (ad.description || 'Anuncio en Ushuaia Local — el directorio más austral.').slice(0, 160);

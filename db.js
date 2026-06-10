@@ -32,6 +32,17 @@ function ensureUniqueSlug(database, name, excludeId = null) {
   }
 }
 
+function ensureUniqueAdSlug(database, name) {
+  const base = generateSlug(name).slice(0, 30) || 'anuncio';
+  let slug = base;
+  let i = 2;
+  while (true) {
+    const row = database.prepare('SELECT id FROM ads WHERE slug = ?').get(slug);
+    if (!row) return slug;
+    slug = `${base}-${i++}`;
+  }
+}
+
 /* ── DB connection ──────────────────────────────────────────────────────────── */
 
 function normalizeCategory(queryDisplayed) {
@@ -126,6 +137,22 @@ function initDb() {
   if (!adsInfo.find(c => c.name === 'views')) {
     database.exec('ALTER TABLE ads ADD COLUMN views INTEGER DEFAULT 0');
     console.log('[db] Columna views agregada a ads.');
+  }
+  if (!adsInfo.find(c => c.name === 'slug')) {
+    database.exec("ALTER TABLE ads ADD COLUMN slug TEXT NOT NULL DEFAULT ''");
+    console.log('[db] Columna slug agregada a ads.');
+  }
+
+  // Backfill slugs for ads that don't have one yet
+  const adsWithoutSlug = database.prepare("SELECT id, title FROM ads WHERE slug = ''").all();
+  if (adsWithoutSlug.length > 0) {
+    const updAd = database.prepare('UPDATE ads SET slug = ? WHERE id = ?');
+    database.transaction(() => {
+      for (const ad of adsWithoutSlug) {
+        updAd.run(ensureUniqueAdSlug(database, ad.title), ad.id);
+      }
+    })();
+    console.log(`[db] ${adsWithoutSlug.length} slugs generados para ads.`);
   }
 
   // Migration: add slug column if missing (existing DBs)
@@ -224,4 +251,4 @@ function migrateFromScrape(database) {
   migrate();
 }
 
-module.exports = { getDb, initDb, generateSlug, ensureUniqueSlug };
+module.exports = { getDb, initDb, generateSlug, ensureUniqueSlug, ensureUniqueAdSlug };

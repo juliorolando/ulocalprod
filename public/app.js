@@ -35,7 +35,7 @@ const EMBEDDED_BIZ = (() => {
   try { return JSON.parse(el.textContent); } catch { return null; }
 })();
 
-/* ── Embedded ad (for /anuncio/:id pages) ───────────────────────────────────── */
+/* ── Embedded ad (for /anuncio/:slug pages) ─────────────────────────────────── */
 const EMBEDDED_AD = (() => {
   const el = document.getElementById('__ad__');
   if (!el) return null;
@@ -704,7 +704,8 @@ function openAd(ad) {
     }
   }).catch(() => {});
 
-  _currentAdId = ad.id;
+  _currentAdId   = ad.id;
+  _currentAdSlug = ad.slug || String(ad.id);
   document.getElementById('ad-modal-img').src     = ad.image_path;
   document.getElementById('ad-modal-img').alt     = ad.title;
   document.getElementById('ad-modal-title').textContent = ad.title;
@@ -742,10 +743,11 @@ document.getElementById('ad-modal').addEventListener('click', e => {
   if (e.target === e.currentTarget) closeAd();
 });
 
-let _currentAdId = null;
+let _currentAdId   = null;
+let _currentAdSlug = null;
 document.getElementById('ad-modal-share').addEventListener('click', async () => {
-  if (!_currentAdId) return;
-  const url = `${location.origin}/anuncio/${_currentAdId}`;
+  if (!_currentAdSlug) return;
+  const url = `${location.origin}/anuncio/${_currentAdSlug}`;
   const btn = document.getElementById('ad-modal-share');
   await navigator.clipboard.writeText(url).catch(() => {});
   const orig = btn.innerHTML;
@@ -756,10 +758,23 @@ document.getElementById('ad-modal-share').addEventListener('click', async () => 
 /* ── Propose-ad modal ───────────────────────────────────────────────────────── */
 let selectedAdDuration = 24;
 
-const _adTitleEl    = document.getElementById('ad-title');
-const _adDescEl     = document.getElementById('ad-description');
-const _adTitleCount = document.getElementById('ad-title-count');
-const _adDescCount  = document.getElementById('ad-desc-count');
+const _adTitleEl      = document.getElementById('ad-title');
+const _adDescEl       = document.getElementById('ad-description');
+const _adTitleCount   = document.getElementById('ad-title-count');
+const _adDescCount    = document.getElementById('ad-desc-count');
+const _adUrlPreviewEl = document.getElementById('ad-url-preview');
+
+function _toAdSlug(str) {
+  return String(str || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .slice(0, 30);
+}
 
 function _updateAdCounter(inputEl, counterEl, max) {
   const remaining = max - inputEl.value.length;
@@ -768,7 +783,20 @@ function _updateAdCounter(inputEl, counterEl, max) {
   counterEl.classList.toggle('char-counter--over',  remaining < 0);
 }
 
-_adTitleEl.addEventListener('input', () => _updateAdCounter(_adTitleEl, _adTitleCount, 100));
+function _updateAdUrlPreview() {
+  const slug = _toAdSlug(_adTitleEl.value);
+  if (!slug) {
+    _adUrlPreviewEl.classList.add('hidden');
+    return;
+  }
+  _adUrlPreviewEl.innerHTML = `<span class="url-domain">ushuaialocal.com/anuncio/</span><span class="url-slug">${slug}</span><span class="url-hint">Así quedará tu enlace para compartir.</span>`;
+  _adUrlPreviewEl.classList.remove('hidden');
+}
+
+_adTitleEl.addEventListener('input', () => {
+  _updateAdCounter(_adTitleEl, _adTitleCount, 60);
+  _updateAdUrlPreview();
+});
 _adDescEl.addEventListener('input',  () => _updateAdCounter(_adDescEl,  _adDescCount,  500));
 
 function openProposeAd() {
@@ -778,10 +806,11 @@ function openProposeAd() {
   document.getElementById('ad-error').textContent = '';
   document.getElementById('ad-preview-wrap')?.classList.add('hidden');
 
-  _adTitleCount.textContent = '100 restantes';
+  _adTitleCount.textContent = '60 restantes';
   _adTitleCount.className   = 'char-counter';
   _adDescCount.textContent  = '500 restantes';
   _adDescCount.className    = 'char-counter';
+  _adUrlPreviewEl.classList.add('hidden');
 
   selectedAdDuration = 24;
   document.querySelectorAll('.duration-pill').forEach((b, i) => b.classList.toggle('active', i === 0));
@@ -836,7 +865,7 @@ document.getElementById('propose-ad-form').addEventListener('submit', async e =>
   if (title.length > 100)      { errEl.textContent = 'El título no puede superar 100 caracteres.';        btn.disabled = false; return; }
   if (description.length > 500){ errEl.textContent = 'La descripción no puede superar 500 caracteres.';  btn.disabled = false; return; }
   if (contactInfo.length > 200){ errEl.textContent = 'El contacto no puede superar 200 caracteres.';     btn.disabled = false; return; }
-  if (!imageFile)              { errEl.textContent = 'Seleccioná una imagen para el anuncio.';            btn.disabled = false; return; }
+  if (!imageFile)              { errEl.textContent = 'Seleccioná una imagen.';                           btn.disabled = false; return; }
 
   const formData = new FormData();
   formData.append('title',        title);
@@ -853,7 +882,7 @@ document.getElementById('propose-ad-form').addEventListener('submit', async e =>
       document.getElementById('propose-ad-success').classList.remove('hidden');
       window.umami?.track('propuesta-anuncio-enviada');
     } else {
-      errEl.textContent = data.error || 'Error al enviar el anuncio.';
+      errEl.textContent = data.error || 'Error al enviar. Intentá de nuevo.';
     }
   } catch {
     errEl.textContent = 'Error de conexión. Intentá de nuevo.';

@@ -492,7 +492,7 @@ function renderAds() {
             </div>
             ${ad.description ? `<p class="proposal-desc">${esc(ad.description)}</p>` : ''}
             ${ad.contact_info ? `<p class="proposal-desc">📞 ${esc(ad.contact_info)}</p>` : ''}
-            <p class="proposal-desc" style="color:var(--text-muted)">Enviado: ${date} · Vence: ${exp}</p>
+            <p class="proposal-desc" style="color:var(--text-muted)">Enviado: ${date} · Vence: ${exp}${ad.slug && ad.status === 'active' ? ` · <a href="/anuncio/${esc(ad.slug)}" target="_blank" rel="noopener" style="color:var(--primary)">/anuncio/${esc(ad.slug)}</a>` : ''}</p>
             <div class="proposal-actions" style="margin-top:0.5rem">
               ${ad.status === 'pending' ? `
                 <button class="btn btn-success btn-small" data-action="approve-ad" data-id="${ad.id}">✓ Aprobar</button>

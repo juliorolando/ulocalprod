@@ -5,7 +5,7 @@ const fs         = require('fs');
 const crypto     = require('crypto');
 const multer     = require('multer');
 const rateLimit  = require('express-rate-limit');
-const { getDb, ensureUniqueSlug } = require('../db');
+const { getDb, ensureUniqueSlug, ensureUniqueAdSlug } = require('../db');
 
 const adLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
@@ -246,7 +246,7 @@ router.get('/ticker', (req, res) => {
 // GET /api/ads  (public — activos y no vencidos)
 router.get('/ads', (req, res) => {
   const rows = getDb().prepare(`
-    SELECT id, title, description, image_path, contact_info, expires_at, created_at, views
+    SELECT id, slug, title, description, image_path, contact_info, expires_at, created_at, views
     FROM ads
     WHERE status = 'active' AND expires_at > date('now')
     ORDER BY created_at DESC
@@ -275,7 +275,7 @@ router.post('/ads', adLimiter, (req, res, next) => {
 
   const { title, description, contact_info, duration } = req.body;
   if (!title?.trim()) return res.status(400).json({ error: 'El título es obligatorio.' });
-  if (title.length > 100) return res.status(400).json({ error: 'El título no puede superar 100 caracteres.' });
+  if (title.length > 60) return res.status(400).json({ error: 'El título no puede superar 60 caracteres.' });
 
   const VALID_DURATIONS = [24, 48, 120];
   const durationHours   = parseInt(duration, 10);
@@ -283,11 +283,14 @@ router.post('/ads', adLimiter, (req, res, next) => {
 
   const cleanExpiry = new Date(Date.now() + durationHours * 60 * 60 * 1000).toISOString().split('T')[0];
 
-  getDb().prepare(`
-    INSERT INTO ads (title, description, image_path, contact_info, expires_at)
-    VALUES (@title, @description, @image_path, @contact_info, @expires_at)
+  const db   = getDb();
+  const slug = ensureUniqueAdSlug(db, title.trim());
+  db.prepare(`
+    INSERT INTO ads (title, slug, description, image_path, contact_info, expires_at)
+    VALUES (@title, @slug, @description, @image_path, @contact_info, @expires_at)
   `).run({
     title:        title.trim(),
+    slug,
     description:  (description  || '').trim().slice(0, 500),
     image_path:   `/uploads/ads/${req.file.filename}`,
     contact_info: (contact_info || '').trim().slice(0, 200),

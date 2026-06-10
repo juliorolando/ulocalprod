@@ -819,6 +819,18 @@ body {
 }
 .char-counter--warn { color: var(--accent); }
 .char-counter--over { color: #9B2335; font-weight: 600; }
+.ad-url-preview {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 0.15rem;
+  font-family: monospace;
+  word-break: break-all;
+  opacity: 0.8;
+}
+.ad-url-preview .url-domain { opacity: 0.55; }
+.ad-url-preview .url-slug   { color: var(--primary); }
+.ad-url-preview .url-hint   { display: block; font-family: inherit; font-size: 0.68rem; margin-top: 0.2rem; opacity: 0.55; }
 .form-divider { border: none; border-top: 1px solid var(--border); margin: 1.25rem 0; }
 .form-error { color: #9B2335; font-size: 0.82rem; min-height: 1.1rem; margin: 0.5rem 0; }
 .form-actions {
