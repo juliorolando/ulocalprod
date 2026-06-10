@@ -248,6 +248,24 @@ function renderCategories(categories) {
     btn.addEventListener('click', () => setCategory(cat));
     strip.appendChild(btn);
   });
+
+  _initCatNav(strip);
+}
+
+function _initCatNav(strip) {
+  const prev = document.querySelector('.cat-nav--prev');
+  const next = document.querySelector('.cat-nav--next');
+  if (!prev || !next) return;
+
+  function update() {
+    prev.hidden = strip.scrollLeft <= 2;
+    next.hidden = strip.scrollLeft + strip.clientWidth >= strip.scrollWidth - 2;
+  }
+
+  prev.addEventListener('click', () => strip.scrollBy({ left: -220, behavior: 'smooth' }));
+  next.addEventListener('click', () => strip.scrollBy({ left:  220, behavior: 'smooth' }));
+  strip.addEventListener('scroll', update, { passive: true });
+  update();
 }
 
 function setCategory(cat) {
