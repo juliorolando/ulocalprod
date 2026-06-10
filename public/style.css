@@ -1010,9 +1010,17 @@ body {
   line-height: 1.25;
 }
 .ad-dmodal-date {
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  margin-bottom: 0.5rem;
+  position: absolute;
+  top: 0.65rem;
+  right: 3.1rem;
+  background: rgba(0,0,0,0.45);
+  color: #fff;
+  font-size: 0.72rem;
+  line-height: 1;
+  padding: 0.3rem 0.55rem;
+  border-radius: 99px;
+  white-space: nowrap;
+  pointer-events: none;
 }
 .ad-dmodal-desc {
   font-size: 0.9rem;

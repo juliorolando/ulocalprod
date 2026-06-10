@@ -637,8 +637,19 @@ document.getElementById('clear-filters').addEventListener('click', () => {
   displayedCount = PAGE_SIZE;
   document.getElementById('search').value = '';
   document.getElementById('clear-search').hidden = true;
+  filterCategoryPills('');
   setCategory('');
 });
+
+/* ── Category pill filtering ────────────────────────────────────────────────── */
+function filterCategoryPills(q) {
+  const qN = q ? stripAccents(q.toLowerCase().trim()) : '';
+  document.querySelectorAll('.cat-pill').forEach(btn => {
+    if (!btn.dataset.category) return; // keep "Todas" always visible
+    const catN = stripAccents(btn.dataset.category.toLowerCase());
+    btn.hidden = qN.length > 0 && !catN.includes(qN);
+  });
+}
 
 /* ── Search ─────────────────────────────────────────────────────────────────── */
 const searchInput    = document.getElementById('search');
@@ -648,6 +659,7 @@ searchInput.addEventListener('input', e => {
   searchQuery    = e.target.value;
   displayedCount = PAGE_SIZE;
   clearSearchBtn.hidden = !searchQuery;
+  filterCategoryPills(searchQuery);
   updateClearFilters();
   render();
 });
@@ -657,6 +669,7 @@ clearSearchBtn.addEventListener('click', () => {
   displayedCount = PAGE_SIZE;
   searchInput.value     = '';
   clearSearchBtn.hidden = true;
+  filterCategoryPills('');
   updateClearFilters();
   render();
   searchInput.focus();

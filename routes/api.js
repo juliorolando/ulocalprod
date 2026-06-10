@@ -4,6 +4,7 @@ const path       = require('path');
 const fs         = require('fs');
 const crypto     = require('crypto');
 const multer     = require('multer');
+const sharp      = require('sharp');
 const rateLimit  = require('express-rate-limit');
 const { getDb, ensureUniqueSlug, ensureUniqueAdSlug } = require('../db');
 
@@ -27,16 +28,6 @@ const reportLimiter = rateLimit({
 const UPLOADS_DIR = path.join(__dirname, '..', 'public', 'uploads', 'ads');
 fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 
-const adStorage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, UPLOADS_DIR),
-  filename:    (req, file, cb) => {
-    const ext = ['.jpg', '.jpeg', '.png', '.webp'].includes(path.extname(file.originalname).toLowerCase())
-      ? path.extname(file.originalname).toLowerCase()
-      : '.jpg';
-    cb(null, `${Date.now()}-${crypto.randomBytes(6).toString('hex')}${ext}`);
-  },
-});
-
 function safeUnlinkAd(imagePath) {
   const resolved = path.resolve(path.join(__dirname, '..', 'public', imagePath));
   const allowed  = path.resolve(UPLOADS_DIR);
@@ -44,8 +35,8 @@ function safeUnlinkAd(imagePath) {
 }
 
 const uploadAd = multer({
-  storage: adStorage,
-  limits: { fileSize: 2 * 1024 * 1024 },
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 20 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     /^image\/(jpeg|png|webp)$/.test(file.mimetype)
       ? cb(null, true)
@@ -264,13 +255,13 @@ router.post('/ads/:id/view', (req, res) => {
 router.post('/ads', adLimiter, (req, res, next) => {
   uploadAd.single('image')(req, res, err => {
     if (err instanceof multer.MulterError) {
-      if (err.code === 'LIMIT_FILE_SIZE') return res.status(400).json({ error: 'La imagen no puede superar 2MB.' });
+      if (err.code === 'LIMIT_FILE_SIZE') return res.status(400).json({ error: 'La imagen no puede superar 20MB.' });
       return res.status(400).json({ error: err.message });
     }
     if (err) return res.status(400).json({ error: err.message });
     next();
   });
-}, (req, res) => {
+}, async (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'La imagen es obligatoria.' });
 
   const { title, description, contact_info, duration } = req.body;
@@ -280,6 +271,18 @@ router.post('/ads', adLimiter, (req, res, next) => {
   const VALID_DURATIONS = [24, 48, 120];
   const durationHours   = parseInt(duration, 10);
   if (!VALID_DURATIONS.includes(durationHours)) return res.status(400).json({ error: 'Duración inválida.' });
+
+  const filename = `${Date.now()}-${crypto.randomBytes(6).toString('hex')}.webp`;
+  const outPath  = path.join(UPLOADS_DIR, filename);
+
+  try {
+    await sharp(req.file.buffer)
+      .resize(1080, 1080, { fit: 'inside', withoutEnlargement: true })
+      .webp({ quality: 82 })
+      .toFile(outPath);
+  } catch {
+    return res.status(500).json({ error: 'Error al procesar la imagen. Intentá con otro archivo.' });
+  }
 
   const cleanExpiry = new Date(Date.now() + durationHours * 60 * 60 * 1000).toISOString().split('T')[0];
 
@@ -292,7 +295,7 @@ router.post('/ads', adLimiter, (req, res, next) => {
     title:        title.trim(),
     slug,
     description:  (description  || '').trim().slice(0, 500),
-    image_path:   `/uploads/ads/${req.file.filename}`,
+    image_path:   `/uploads/ads/${filename}`,
     contact_info: (contact_info || '').trim().slice(0, 200),
     expires_at:   cleanExpiry,
   });
