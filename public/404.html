@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Página no encontrada — Ushuaia Local</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary:    #C4622D;
+      --primary-dk: #a84e22;
+      --bg:         #F9F4EE;
+      --surface:    #FFFFFF;
+      --text:       #2C2416;
+      --text-sub:   #6B5B47;
+      --text-muted: #9E8B74;
+      --border:     #E2D5C3;
+      --font:       'Inter', system-ui, sans-serif;
+      --font-head:  'Playfair Display', Georgia, serif;
+      --radius-pill: 999px;
+      --transition: 0.18s ease;
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header mínimo ── */
+    .header {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      text-decoration: none;
+    }
+    .logo-mark {
+      width: 32px; height: 32px;
+      background: var(--primary);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+    }
+    .brand-name {
+      font-family: var(--font-head);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    /* ── Contenido 404 ── */
+    .wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 3rem 1.5rem;
+    }
+
+    .num {
+      font-family: var(--font-head);
+      font-size: clamp(6rem, 22vw, 11rem);
+      font-weight: 700;
+      color: var(--primary);
+      line-height: 1;
+      opacity: 0.12;
+      user-select: none;
+      letter-spacing: -0.02em;
+    }
+
+    .icon {
+      font-size: 3.2rem;
+      margin-top: -3rem;
+      filter: drop-shadow(0 2px 6px rgba(44,36,22,0.12));
+    }
+
+    .title {
+      font-family: var(--font-head);
+      font-size: clamp(1.5rem, 4vw, 2.1rem);
+      color: var(--text);
+      margin-top: 1.25rem;
+    }
+
+    .sub {
+      color: var(--text-sub);
+      font-size: 0.97rem;
+      max-width: 380px;
+      margin-top: 0.6rem;
+      line-height: 1.65;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: 2rem;
+      padding: 0.72rem 1.7rem;
+      background: var(--primary);
+      color: #fff;
+      border-radius: var(--radius-pill);
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 600;
+      transition: background var(--transition), transform var(--transition);
+    }
+    .btn:hover { background: var(--primary-dk); transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+
+    .footer-note {
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      margin-top: 1.2rem;
+    }
+  </style>
+</head>
+<body>
+
+  <a href="/" class="header">
+    <div class="logo-mark">🏔</div>
+    <span class="brand-name">Ushuaia Local</span>
+  </a>
+
+  <div class="wrap">
+    <div class="num">404</div>
+    <div class="icon">🧭</div>
+    <h1 class="title">Página no encontrada</h1>
+    <p class="sub">Este rincón del fin del mundo no existe (todavía). El enlace puede haber cambiado o sido removido.</p>
+    <a href="/" class="btn">← Volver al inicio</a>
+    <p class="footer-note">ushuaialocal.com</p>
+  </div>
+
+</body>
+</html>
