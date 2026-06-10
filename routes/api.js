@@ -236,12 +236,18 @@ router.post('/report', reportLimiter, (req, res) => {
 // GET /api/ads  (public — activos y no vencidos)
 router.get('/ads', (req, res) => {
   const rows = getDb().prepare(`
-    SELECT id, title, description, image_path, contact_info, expires_at, created_at
+    SELECT id, title, description, image_path, contact_info, expires_at, created_at, views
     FROM ads
     WHERE status = 'active' AND expires_at > date('now')
     ORDER BY created_at DESC
   `).all();
   res.json(rows);
+});
+
+// POST /api/ads/:id/view  (public — registra una vista)
+router.post('/ads/:id/view', (req, res) => {
+  getDb().prepare(`UPDATE ads SET views = views + 1 WHERE id = ? AND status = 'active'`).run(req.params.id);
+  res.json({ ok: true });
 });
 
 // POST /api/ads  (public — propuesta de anuncio)

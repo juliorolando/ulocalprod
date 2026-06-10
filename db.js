@@ -113,6 +113,13 @@ function initDb() {
     );
   `);
 
+  // Migration: add views column to ads if missing
+  const adsInfo = database.prepare('PRAGMA table_info(ads)').all();
+  if (!adsInfo.find(c => c.name === 'views')) {
+    database.exec('ALTER TABLE ads ADD COLUMN views INTEGER DEFAULT 0');
+    console.log('[db] Columna views agregada a ads.');
+  }
+
   // Migration: add slug column if missing (existing DBs)
   const tableInfo = database.prepare('PRAGMA table_info(businesses)').all();
   if (!tableInfo.find(c => c.name === 'slug')) {
