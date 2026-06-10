@@ -647,7 +647,7 @@ document.getElementById('grid').addEventListener('keydown', e => {
 
 /* ── Clear filters ──────────────────────────────────────────────────────────── */
 function updateClearFilters() {
-  document.getElementById('clear-filters').hidden = !activeCategory && !searchQuery;
+  document.getElementById('clear-filters').hidden = true; // handled by "Todos" pill + search ×
 }
 
 document.getElementById('clear-filters').addEventListener('click', () => {
