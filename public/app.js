@@ -875,7 +875,7 @@ document.getElementById('propose-ad-form').addEventListener('submit', async e =>
   const imageFile   = document.getElementById('ad-image').files[0];
 
   if (!title)                  { errEl.textContent = 'El título es obligatorio.';                         btn.disabled = false; return; }
-  if (title.length > 100)      { errEl.textContent = 'El título no puede superar 100 caracteres.';        btn.disabled = false; return; }
+  if (title.length > 60)       { errEl.textContent = 'El título no puede superar 60 caracteres.';         btn.disabled = false; return; }
   if (description.length > 500){ errEl.textContent = 'La descripción no puede superar 500 caracteres.';  btn.disabled = false; return; }
   if (contactInfo.length > 200){ errEl.textContent = 'El contacto no puede superar 200 caracteres.';     btn.disabled = false; return; }
   if (!imageFile)              { errEl.textContent = 'Seleccioná una imagen.';                           btn.disabled = false; return; }
@@ -888,7 +888,12 @@ document.getElementById('propose-ad-form').addEventListener('submit', async e =>
   formData.append('image',        imageFile);
 
   try {
-    const res  = await fetch('/api/ads', { method: 'POST', body: formData });
+    const res = await fetch('/api/ads', { method: 'POST', body: formData });
+    if (res.status === 413) {
+      errEl.textContent = 'La imagen es demasiado grande. Intentá con una foto más pequeña.';
+      btn.disabled = false;
+      return;
+    }
     const data = await res.json();
     if (data.ok) {
       document.getElementById('propose-ad-form').hidden = true;
