@@ -106,8 +106,9 @@ app.use(express.static(path.join(__dirname, 'public'), {
   },
 }));
 
-app.use('/api',    require('./routes/api'));
-app.use('/admin',  require('./routes/admin'));
+app.use('/api',               require('./routes/api'));
+app.use('/admin',             require('./routes/admin'));
+app.use('/telegram-webhook',  require('./routes/telegram'));
 
 // ── 404 ──────────────────────────────────────────────────────────────────────
 app.use((req, res) => {
@@ -127,4 +128,10 @@ process.on('unhandledRejection', err  => { console.error('unhandledRejection:', 
 // ── Arrancar ─────────────────────────────────────────────────────────────────
 app.listen(PORT, () => {
   console.log(`[${new Date().toISOString()}] Servidor en http://localhost:${PORT} (${PROD ? 'producción' : 'desarrollo'})`);
+  if (PROD && process.env.APP_URL && process.env.TELEGRAM_BOT_TOKEN) {
+    require('./lib/telegram')
+      .registerWebhook(`${process.env.APP_URL}/telegram-webhook`)
+      .then(() => console.log('[telegram] Webhook registrado'))
+      .catch(() => {});
+  }
 });

@@ -7,7 +7,7 @@ const multer     = require('multer');
 const sharp      = require('sharp');
 const rateLimit  = require('express-rate-limit');
 const { getDb, ensureUniqueSlug, ensureUniqueAdSlug } = require('../db');
-const { notify } = require('../lib/telegram');
+const { notify, notifyPhoto } = require('../lib/telegram');
 
 const adLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
@@ -178,7 +178,7 @@ router.post('/propose', (req, res) => {
     }
   }
 
-  getDb().prepare(`
+  const { lastInsertRowid: proposalId } = getDb().prepare(`
     INSERT INTO proposals (name, categories, address, phone, website, description, contact_name, contact_info)
     VALUES (@name, @categories, @address, @phone, @website, @description, @contact_name, @contact_info)
   `).run({
@@ -198,7 +198,8 @@ router.post('/propose', (req, res) => {
     (categories   ? `<b>Rubro:</b> ${categories.trim()}\n`   : '') +
     (address      ? `<b>Dirección:</b> ${address.trim()}\n`  : '') +
     (contact_name ? `<b>Quien escribe:</b> ${contact_name.trim()}\n` : '') +
-    `<b>Contacto:</b> ${contact_info.trim()}`
+    `<b>Contacto:</b> ${contact_info.trim()}`,
+    [[{ text: '✅ Marcar revisada', callback_data: `approve_proposal_${proposalId}` }]]
   );
 
   res.json({ ok: true });
@@ -220,7 +221,7 @@ router.post('/report', reportLimiter, (req, res) => {
   const bizId = business_id ? parseInt(business_id, 10) : null;
   if (business_id && (!Number.isInteger(bizId) || bizId <= 0)) return res.status(400).json({ error: 'ID de negocio inválido.' });
 
-  getDb().prepare(`
+  const { lastInsertRowid: reportId } = getDb().prepare(`
     INSERT INTO reports (business_id, business_name, type, message, contact_info)
     VALUES (@business_id, @business_name, @type, @message, @contact_info)
   `).run({
@@ -236,7 +237,8 @@ router.post('/report', reportLimiter, (req, res) => {
     `<b>Negocio:</b> ${business_name.trim()}\n` +
     `<b>Tipo:</b> ${type.trim()}\n` +
     `<b>Mensaje:</b> ${message.trim()}\n` +
-    (contact_info ? `<b>Contacto:</b> ${contact_info.trim()}` : '')
+    (contact_info ? `<b>Contacto:</b> ${contact_info.trim()}` : ''),
+    [[{ text: '✅ Marcar revisado', callback_data: `approve_report_${reportId}` }]]
   );
 
   res.json({ ok: true });
@@ -306,7 +308,7 @@ router.post('/ads', adLimiter, (req, res, next) => {
 
   const db   = getDb();
   const slug = ensureUniqueAdSlug(db, title.trim());
-  db.prepare(`
+  const { lastInsertRowid: adId } = db.prepare(`
     INSERT INTO ads (title, slug, description, image_path, contact_info, expires_at)
     VALUES (@title, @slug, @description, @image_path, @contact_info, @expires_at)
   `).run({
@@ -318,14 +320,25 @@ router.post('/ads', adLimiter, (req, res, next) => {
     expires_at:   cleanExpiry,
   });
 
-  notify(
+  const photoUrl = process.env.APP_URL
+    ? `${process.env.APP_URL}/uploads/ads/${filename}`
+    : null;
+
+  const adCaption =
     `📌 <b>Nuevo anuncio en comunidad</b>\n` +
     `<b>Título:</b> ${title.trim()}\n` +
     `<b>Duración:</b> ${durationHours}hs (vence ${cleanExpiry})\n` +
     (description  ? `<b>Desc:</b> ${description.trim().slice(0, 120)}\n` : '') +
-    (contact_info ? `<b>Contacto:</b> ${contact_info.trim()}` : '') +
-    `\n🔗 ushuaialocal.com/anuncio/${slug}`
-  );
+    (contact_info ? `<b>Contacto:</b> ${contact_info.trim()}\n` : '') +
+    `🔗 ushuaialocal.com/anuncio/${slug}`;
+
+  const adKeyboard = [[{ text: '✅ Publicar anuncio', callback_data: `approve_ad_${adId}` }]];
+
+  if (photoUrl) {
+    notifyPhoto(photoUrl, adCaption, adKeyboard);
+  } else {
+    notify(adCaption, adKeyboard);
+  }
 
   res.json({ ok: true });
 });
