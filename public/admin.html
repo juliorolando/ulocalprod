@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Ushuaia Local</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/admin.css">
+</head>
+<body>
+
+  <!-- Login -->
+  <div id="login-screen" class="screen auth-screen">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="logo-mark logo-mark--lg">UL</div>
+        <h2 class="auth-title">Ushuaia Local</h2>
+        <p class="auth-sub">Panel de administración</p>
+      </div>
+      <form id="login-form" autocomplete="off">
+        <div class="form-group">
+          <label class="form-label">Usuario</label>
+          <input type="text" id="username" class="form-input" placeholder="Usuario" required autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Contraseña</label>
+          <input type="password" id="password" class="form-input" placeholder="Contraseña" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Ingresar</button>
+        <p class="error-msg" id="login-error"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="dashboard-screen" class="screen hidden admin-body">
+
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="admin-brand">
+        <div class="logo">
+          <div class="logo-mark">UL</div>
+          <span class="logo-text">Ushuaia Local</span>
+        </div>
+      </div>
+      <nav class="admin-nav">
+        <button class="admin-nav-link active" data-section="negocios">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Negocios
+        </button>
+        <button class="admin-nav-link" data-section="propuestas">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Propuestas
+          <span class="nav-badge" id="proposal-badge" hidden>0</span>
+        </button>
+        <button class="admin-nav-link" data-section="anuncios">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+          Anuncios
+          <span class="nav-badge" id="ads-badge" hidden>0</span>
+        </button>
+        <button class="admin-nav-link" data-section="reportes">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Reportes
+          <span class="nav-badge" id="reports-badge" hidden>0</span>
+        </button>
+        <button class="admin-nav-link" data-section="estadisticas">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          Estadísticas
+        </button>
+      </nav>
+      <div class="admin-sidebar-footer">
+        <button id="logout-btn" class="admin-nav-link admin-nav-link--btn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Cerrar sesión
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <div class="admin-main">
+      <div class="admin-topbar">
+        <h1 class="admin-page-title" id="section-title">Negocios</h1>
+        <div id="topbar-negocios" class="topbar-right">
+          <span id="biz-count" class="admin-user-badge"></span>
+          <button id="add-btn" class="btn btn-primary btn-small">+ Agregar negocio</button>
+        </div>
+        <div id="topbar-propuestas" class="topbar-right hidden">
+          <span id="pending-count" class="admin-user-badge"></span>
+        </div>
+        <div id="topbar-anuncios" class="topbar-right hidden">
+          <span id="ads-count" class="admin-user-badge"></span>
+        </div>
+        <div id="topbar-reportes" class="topbar-right hidden">
+          <span id="reports-count" class="admin-user-badge"></span>
+        </div>
+        <div id="topbar-estadisticas" class="topbar-right hidden">
+          <button id="stats-refresh-btn" class="btn btn-ghost btn-small">↻ Actualizar</button>
+        </div>
+      </div>
+
+      <div class="admin-content">
+
+        <!-- Sección: Negocios -->
+        <div id="section-negocios">
+          <div class="admin-search-form">
+            <input type="text" id="admin-search" class="admin-input" placeholder="Buscar por nombre, categoría, dirección…">
+            <select id="sort-select" class="admin-select">
+              <option value="name">Nombre A–Z</option>
+              <option value="recent">Más recientes primero</option>
+            </select>
+          </div>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Categorías</th>
+                  <th>Dirección</th>
+                  <th>Teléfono</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="table-body">
+                <tr><td colspan="6" class="table-empty">Cargando...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Sección: Propuestas -->
+        <div id="section-propuestas" class="hidden">
+          <div id="proposals-list">
+            <p class="table-empty">Cargando propuestas…</p>
+          </div>
+        </div>
+
+        <!-- Sección: Reportes -->
+        <div id="section-reportes" class="hidden">
+          <div id="reports-list">
+            <p class="table-empty">Cargando reportes…</p>
+          </div>
+        </div>
+
+        <!-- Sección: Estadísticas -->
+        <div id="section-estadisticas" class="hidden">
+          <div id="stats-container">
+            <p class="table-empty">Cargando estadísticas…</p>
+          </div>
+        </div>
+
+        <!-- Sección: Anuncios -->
+        <div id="section-anuncios" class="hidden">
+          <div class="admin-filter-row">
+            <button class="filter-pill active" data-ads-filter="pending">Pendientes</button>
+            <button class="filter-pill" data-ads-filter="active">Activos</button>
+            <button class="filter-pill" data-ads-filter="rejected">Rechazados</button>
+            <button class="filter-pill" data-ads-filter="all">Todos</button>
+          </div>
+          <div id="ads-list">
+            <p class="table-empty">Cargando anuncios…</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Agregar / Editar negocio -->
+  <div id="modal" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modal-title" class="modal-title">Agregar negocio</h3>
+        <button id="modal-close" type="button" class="btn-icon">&times;</button>
+      </div>
+      <form id="biz-form">
+        <input type="hidden" id="biz-id">
+        <div class="form-group">
+          <label class="form-label">Nombre <span class="required">*</span></label>
+          <input type="text" id="biz-name" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Categorías <span class="hint">(separadas por coma)</span></label>
+          <input type="text" id="biz-categories" class="form-input" placeholder="Restaurantes, Bares">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Dirección</label>
+          <input type="text" id="biz-address" class="form-input">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Teléfono</label>
+          <input type="tel" id="biz-phone" class="form-input">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Sitio web</label>
+          <input type="url" id="biz-website" class="form-input" placeholder="https://...">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Descripción corta</label>
+          <textarea id="biz-description" class="form-textarea" rows="2" placeholder="Opcional"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="label-checkbox">
+            <input type="checkbox" id="biz-active" checked>
+            Activo (visible en el directorio)
+          </label>
+        </div>
+        <p class="error-msg" id="form-error"></p>
+        <div class="form-actions">
+          <button type="button" id="cancel-btn" class="btn btn-ghost">Cancelar</button>
+          <button type="submit" id="submit-btn" class="btn btn-primary">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/admin.js"></script>
+</body>
+</html>

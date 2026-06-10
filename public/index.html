@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ushuaia Local — Directorio de negocios</title>
+  <meta name="description" content="Guía local de negocios, restaurantes, comercios y servicios de Ushuaia. Hecha por vecinos para turistas y locales.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+  <div class="sticky-header">
+    <header class="hero">
+      <div class="hero-inner">
+        <a href="/" class="brand">
+          <div class="logo-mark">UL</div>
+          <span class="brand-name">Ushuaia Local</span>
+        </a>
+        <div class="search-wrap">
+          <svg class="search-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="search" id="search" placeholder="Restaurante, hotel, abogado…"
+            autocomplete="off" autocorrect="off" spellcheck="false">
+          <button id="clear-search" class="clear-btn" aria-label="Limpiar búsqueda" hidden>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="cat-bar">
+      <div class="cat-strip" id="categories" role="list">
+        <button class="cat-pill active" data-category="" role="listitem">Todos</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="status-bar container-wide">
+    <span id="results-info" class="results-count"></span>
+    <button id="clear-filters" class="link-btn" hidden>Limpiar filtros</button>
+  </div>
+
+  <!-- Anuncios -->
+  <section id="ads-section" class="ads-section">
+    <div class="ads-header container-wide">
+      <span class="ads-label">Anuncios y novedades</span>
+    </div>
+    <div class="ads-strip container-wide" id="ads-strip" role="list"></div>
+  </section>
+
+  <main id="main">
+    <div id="grid">
+      <div class="skeleton-grid" id="skeleton" aria-label="Cargando…">
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+      </div>
+    </div>
+    <div id="load-more-wrap" class="load-more-wrap" hidden>
+      <button id="load-more-btn" class="load-more-btn">Cargar más negocios</button>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="logo-mark footer-logo-mark">UL</div>
+        <span class="footer-title">UshuaiaLocal</span>
+      </div>
+      
+      <p class="footer-copy">&copy; 2026 UshuaiaLocal. Hecho con ❄️ desde el Fin del Mundo.</p>
+    </div>
+  </footer>
+
+  <!-- FAB -->
+  <button class="fab" id="fab-sumar" aria-label="Sumar al directorio">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+    </svg>
+    Sumar
+  </button>
+
+  <!-- Modal: Chooser (Sumar) -->
+  <div id="chooser-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="chooser-title">
+    <div class="chooser-modal">
+      <div class="chooser-header">
+        <h2 class="chooser-title" id="chooser-title">¿Qué querés sumar?</h2>
+        <button class="dmodal-close" id="chooser-close" aria-label="Cerrar">&times;</button>
+      </div>
+      <div class="chooser-options">
+        <button class="chooser-option" id="chooser-go-negocio">
+          <span class="chooser-icon" aria-hidden="true">🏪</span>
+          <strong class="chooser-name">Mi negocio</strong>
+          <p class="chooser-desc">Sumá tu local, emprendimiento o servicio al directorio de Ushuaia.</p>
+          <span class="chooser-badge">Gratis · Permanente</span>
+        </button>
+        <button class="chooser-option" id="chooser-go-anuncio">
+          <span class="chooser-icon" aria-hidden="true">📢</span>
+          <strong class="chooser-name">Un anuncio</strong>
+          <p class="chooser-desc">Publicá una promo, evento, búsqueda de trabajo o cualquier novedad.</p>
+          <span class="chooser-badge">Gratis · 24 hs a 5 días</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Detalle de negocio -->
+  <div id="detail-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="detail-name">
+    <div class="dmodal">
+      <div class="dmodal-header">
+        <div class="dmodal-header-left">
+          <div id="detail-avatar"></div>
+          <div>
+            <div id="detail-cats" class="dmodal-cats"></div>
+            <h2 id="detail-name" class="dmodal-name"></h2>
+          </div>
+        </div>
+        <div class="dmodal-header-actions">
+          <button class="dmodal-report-btn" id="detail-report" aria-label="Sugerir cambio o informar algo" title="Sugerir un cambio">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/>
+            </svg>
+          </button>
+          <button class="dmodal-close" id="detail-close" aria-label="Cerrar">&times;</button>
+        </div>
+      </div>
+      <div class="dmodal-body">
+        <div id="detail-rows"></div>
+        <p id="detail-desc" class="dmodal-desc hidden"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Proponer negocio -->
+  <div id="propose-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="pmodal">
+      <div class="pmodal-header">
+        <h2 class="pmodal-title">Sumar mi negocio</h2>
+        <button class="dmodal-close" id="propose-close" aria-label="Cerrar">&times;</button>
+      </div>
+      <div class="pmodal-body">
+        <div id="propose-success" class="pmodal-success hidden">
+          <div class="pmodal-success-icon">✓</div>
+          <p><strong>¡Propuesta enviada!</strong><br>La revisamos y te contactamos a la brevedad.</p>
+        </div>
+        <form id="propose-form">
+          <p class="free-badge">✓ Totalmente gratis</p>
+          <p class="pmodal-intro">Completá el formulario y revisamos tu propuesta para incluirla en el directorio.</p>
+          <div class="form-group">
+            <label class="form-label" for="p-name">Nombre del negocio <span class="required">*</span></label>
+            <input type="text" id="p-name" class="form-input" required maxlength="200" placeholder="Ej: La Cantina del Fin del Mundo">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="p-categories">Rubro / categoría <span class="form-hint">(separados por coma)</span></label>
+            <input type="text" id="p-categories" class="form-input" maxlength="200" placeholder="Ej: Restaurante, Parrilla">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="p-address">Dirección</label>
+            <input type="text" id="p-address" class="form-input" maxlength="300" placeholder="Ej: San Martín 845">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="p-phone">Teléfono</label>
+            <input type="tel" id="p-phone" class="form-input" maxlength="50" placeholder="Ej: +54 2901 123456">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="p-website">Sitio web / Instagram / Facebook</label>
+            <input type="url" id="p-website" class="form-input" maxlength="500" placeholder="https://...">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="p-description">Descripción breve</label>
+            <textarea id="p-description" class="form-textarea" rows="2" maxlength="1000" placeholder="Contanos un poco sobre el negocio…"></textarea>
+          </div>
+          <hr class="form-divider">
+          <div class="form-group">
+            <label class="form-label" for="p-contact">Tu nombre</label>
+            <input type="text" id="p-contact" class="form-input" maxlength="200" placeholder="¿Quién nos escribe?">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="p-contact-info">Email o teléfono de contacto <span class="required">*</span></label>
+            <input type="text" id="p-contact-info" class="form-input" required maxlength="200" placeholder="Para poder comunicarnos con vos">
+          </div>
+          <p class="form-error" id="p-error"></p>
+          <div class="form-actions">
+            <button type="button" id="propose-cancel" class="btn-muted">Cancelar</button>
+            <button type="submit" class="btn-primary-solid">Enviar propuesta</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Detalle de anuncio -->
+  <div id="ad-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="ad-dmodal">
+      <div class="ad-dmodal-img-wrap">
+        <img id="ad-modal-img" src="" alt="">
+        <button class="ad-dmodal-close" id="ad-modal-close" aria-label="Cerrar">&times;</button>
+      </div>
+      <div class="ad-dmodal-body">
+        <h2 id="ad-modal-title" class="ad-dmodal-title"></h2>
+        <p id="ad-modal-desc" class="ad-dmodal-desc hidden"></p>
+        <p id="ad-modal-contact" class="ad-dmodal-contact hidden"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Publicar anuncio -->
+  <div id="propose-ad-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="pmodal">
+      <div class="pmodal-header">
+        <h2 class="pmodal-title">Publicar un anuncio</h2>
+        <button class="dmodal-close" id="propose-ad-close" aria-label="Cerrar">&times;</button>
+      </div>
+      <div class="pmodal-body">
+        <div id="propose-ad-success" class="pmodal-success hidden">
+          <div class="pmodal-success-icon">✓</div>
+          <p><strong>¡Anuncio enviado!</strong><br>Lo revisamos y lo publicamos a la brevedad.</p>
+        </div>
+        <form id="propose-ad-form" enctype="multipart/form-data">
+          <p class="free-badge">✓ Totalmente gratis</p>
+          <p class="pmodal-intro">Tu anuncio quedará visible una vez que lo revisemos. Solo imágenes JPG, PNG o WEBP hasta 2MB.</p>
+          <div class="form-group">
+            <label class="form-label" for="ad-title">Título <span class="required">*</span></label>
+            <input type="text" id="ad-title" class="form-input" required maxlength="100" placeholder="Ej: 2x1 en cervezas artesanales esta noche">
+            <small class="char-counter" id="ad-title-count">100 restantes</small>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="ad-image">Imagen <span class="required">*</span></label>
+            <input type="file" id="ad-image" class="form-input" accept="image/jpeg,image/png,image/webp" required>
+            <div id="ad-preview-wrap" class="ad-preview-wrap hidden">
+              <img id="ad-preview" class="ad-preview-img" src="" alt="Vista previa">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="ad-description">Descripción <span class="form-hint">(opcional)</span></label>
+            <textarea id="ad-description" class="form-textarea" rows="2" maxlength="500" placeholder="Más detalles sobre el anuncio…"></textarea>
+            <small class="char-counter" id="ad-desc-count">500 restantes</small>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="ad-contact">Contacto <span class="form-hint">(opcional — teléfono, Instagram, etc.)</span></label>
+            <input type="text" id="ad-contact" class="form-input" maxlength="200" placeholder="Ej: +54 2901 123456 / @milocal">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Duración <span class="required">*</span></label>
+            <div class="duration-pills" role="group" aria-label="Duración del anuncio">
+              <button type="button" class="duration-pill active" data-hours="24">24 hs</button>
+              <button type="button" class="duration-pill" data-hours="48">48 hs</button>
+              <button type="button" class="duration-pill" data-hours="120">5 días</button>
+            </div>
+          </div>
+          <p class="form-error" id="ad-error"></p>
+          <div class="form-actions">
+            <button type="button" id="propose-ad-cancel" class="btn-muted">Cancelar</button>
+            <button type="submit" class="btn-primary-solid">Enviar anuncio</button>
+          </div>
+          <p class="form-help-text">¿Necesitás ayuda con tu anuncio? <a href="mailto:ushuaialocal@gmail.com">Contactanos</a></p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Reportar / sugerir cambio -->
+  <div id="report-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="pmodal">
+      <div class="pmodal-header">
+        <h2 class="pmodal-title">Sugerir un cambio</h2>
+        <button class="dmodal-close" id="report-close" aria-label="Cerrar">&times;</button>
+      </div>
+      <div class="pmodal-body">
+        <div id="report-success" class="pmodal-success hidden">
+          <div class="pmodal-success-icon">✓</div>
+          <p><strong>¡Gracias!</strong><br>Tu reporte fue recibido y lo revisamos a la brevedad.</p>
+        </div>
+        <form id="report-form">
+          <p class="pmodal-intro" id="report-biz-label"></p>
+          <div class="form-group">
+            <label class="form-label" for="r-type">¿Qué querés informar? <span class="required">*</span></label>
+            <select id="r-type" class="form-input" required>
+              <option value="" disabled selected>Seleccioná una opción…</option>
+              <option value="Información incorrecta">Información incorrecta</option>
+              <option value="Falta información">Falta información (teléfono, web, horarios…)</option>
+              <option value="Negocio cerrado">El negocio cerró o ya no existe</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="r-message">Contanos más <span class="required">*</span></label>
+            <textarea id="r-message" class="form-textarea" rows="3" required maxlength="1000" placeholder="Describí qué está mal o qué falta…"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="r-contact">Tu email o teléfono <span class="form-hint">(opcional, por si necesitamos consultarte)</span></label>
+            <input type="text" id="r-contact" class="form-input" maxlength="200" placeholder="Para poder contactarte si hace falta">
+          </div>
+          <p class="form-error" id="r-error"></p>
+          <div class="form-actions">
+            <button type="button" id="report-cancel" class="btn-muted">Cancelar</button>
+            <button type="submit" class="btn-primary-solid">Enviar reporte</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

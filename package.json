@@ -1,0 +1,20 @@
+{
+  "name": "ushuaia-directorio",
+  "version": "1.0.0",
+  "description": "Directorio de negocios de Ushuaia",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.10.0",
+    "compression": "^1.8.1",
+    "dotenv": "^16.6.1",
+    "express": "^4.22.2",
+    "express-rate-limit": "^8.5.2",
+    "express-session": "^1.19.0",
+    "helmet": "^8.2.0",
+    "multer": "^2.1.1"
+  }
+}
