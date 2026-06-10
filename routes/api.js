@@ -239,7 +239,7 @@ router.get('/ads', (req, res) => {
   const rows = getDb().prepare(`
     SELECT id, slug, title, description, image_path, contact_info, expires_at, created_at, views, featured
     FROM ads
-    WHERE status = 'active' AND expires_at > date('now')
+    WHERE status = 'active' AND expires_at >= date('now')
     ORDER BY featured DESC, created_at DESC
   `).all();
   res.json(rows);

@@ -26,12 +26,15 @@ router.get('/:slug', (req, res) => {
   if (!slug) return res.redirect('/');
 
   const ad = getDb().prepare(`
-    SELECT id, slug, title, description, image_path, contact_info, expires_at, created_at, views
+    SELECT id, slug, title, description, image_path, contact_info, expires_at, created_at, views, featured
     FROM ads
-    WHERE slug = ? AND status = 'active' AND expires_at > date('now')
+    WHERE slug = ? AND status = 'active' AND expires_at >= date('now')
   `).get(slug);
 
-  if (!ad) return res.redirect('/');
+  if (!ad) {
+    console.log(`[anuncio] not found — slug="${slug}" date="${new Date().toISOString()}"`);
+    return res.redirect('/');
+  }
 
   const base      = `${req.protocol}://${req.get('host')}`;
   const ogUrl     = `${base}/anuncio/${ad.slug}`;
