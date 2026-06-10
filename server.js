@@ -22,11 +22,11 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc:  ["'self'"],
-      scriptSrc:   ["'self'"],
+      scriptSrc:   ["'self'", 'https://cloud.umami.is'],
       styleSrc:    ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
       fontSrc:     ["'self'", 'https://fonts.gstatic.com'],
       imgSrc:      ["'self'", 'data:', 'https:'],
-      connectSrc:  ["'self'"],
+      connectSrc:  ["'self'", 'https://cloud.umami.is'],
       frameAncestors: ["'none'"],
       objectSrc:   ["'none'"],
     },

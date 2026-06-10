@@ -454,7 +454,10 @@ function closeChooser() {
   document.body.style.overflow = '';
 }
 
-document.getElementById('fab-sumar').addEventListener('click', openChooser);
+document.getElementById('fab-sumar').addEventListener('click', () => {
+  openChooser();
+  window.umami?.track('sumar-click');
+});
 document.getElementById('chooser-close').addEventListener('click', closeChooser);
 document.getElementById('chooser-modal').addEventListener('click', e => {
   if (e.target === e.currentTarget) closeChooser();
@@ -462,10 +465,12 @@ document.getElementById('chooser-modal').addEventListener('click', e => {
 document.getElementById('chooser-go-negocio').addEventListener('click', () => {
   closeChooser();
   openPropose();
+  window.umami?.track('sumar-negocio');
 });
 document.getElementById('chooser-go-anuncio').addEventListener('click', () => {
   closeChooser();
   openProposeAd();
+  window.umami?.track('sumar-anuncio');
 });
 
 /* ── Propose modal ──────────────────────────────────────────────────────────── */
@@ -510,6 +515,7 @@ document.getElementById('propose-form').addEventListener('submit', async e => {
     if (data.ok) {
       document.getElementById('propose-form').hidden = true;
       document.getElementById('propose-success').classList.remove('hidden');
+      window.umami?.track('propuesta-negocio-enviada');
     } else {
       errEl.textContent = data.error || 'Error al enviar la propuesta.';
     }
@@ -845,6 +851,7 @@ document.getElementById('propose-ad-form').addEventListener('submit', async e =>
     if (data.ok) {
       document.getElementById('propose-ad-form').hidden = true;
       document.getElementById('propose-ad-success').classList.remove('hidden');
+      window.umami?.track('propuesta-anuncio-enviada');
     } else {
       errEl.textContent = data.error || 'Error al enviar el anuncio.';
     }
