@@ -477,6 +477,9 @@ function renderAds() {
   const statusLabel = { pending: 'Pendiente', active: 'Activo', rejected: 'Rechazado', expired: 'Vencido' };
   const statusCls   = { pending: 'status-pending', active: 'active', rejected: 'inactive', expired: 'inactive' };
 
+  const todayISO = new Date().toISOString().split('T')[0];
+  const maxISO   = new Date(Date.now() + 30*24*60*60*1000).toISOString().split('T')[0];
+
   container.innerHTML = filtered.map(ad => {
     const ds   = adDisplayStatus(ad);
     const date = new Date(ad.created_at).toLocaleDateString('es-AR', { day:'numeric', month:'short', year:'numeric' });
@@ -487,7 +490,7 @@ function renderAds() {
           <img class="ad-admin-thumb" src="${esc(ad.image_path)}" alt="${esc(ad.title)}" loading="lazy">
           <div class="ad-admin-info">
             <div class="ad-admin-header">
-              <strong class="ad-admin-title">${esc(ad.title)}</strong>
+              <strong class="ad-admin-title">${ad.featured ? '⭐ ' : ''}${esc(ad.title)}</strong>
               <span class="status ${statusCls[ds]}">${statusLabel[ds]}</span>
             </div>
             ${ad.description ? `<p class="proposal-desc">${esc(ad.description)}</p>` : ''}
@@ -498,9 +501,17 @@ function renderAds() {
                 <button class="btn btn-success btn-small" data-action="approve-ad" data-id="${ad.id}">✓ Aprobar</button>
                 <button class="btn btn-danger btn-small"  data-action="reject-ad"  data-id="${ad.id}">✗ Rechazar</button>` : ''}
               ${ad.status === 'active' ? `
-                <button class="btn btn-ghost btn-small"   data-action="reject-ad"  data-id="${ad.id}">Desactivar</button>` : ''}
-              <button class="btn btn-danger btn-small"    data-action="delete-ad"  data-id="${ad.id}">Eliminar</button>
+                <button class="btn btn-star btn-small"  data-action="feature-ad"  data-id="${ad.id}">${ad.featured ? '✦ Quitar destaque' : '⭐ Destacar'}</button>
+                <button class="btn btn-ghost btn-small" data-action="reject-ad"   data-id="${ad.id}">Desactivar</button>` : ''}
+              <button class="btn btn-danger btn-small" data-action="delete-ad" data-id="${ad.id}">Eliminar</button>
             </div>
+            ${ad.status === 'active' ? `
+            <div class="ad-expires-row">
+              <label class="ad-expires-label">Extender hasta:</label>
+              <input type="date" class="ad-expires-input" data-id="${ad.id}"
+                value="${ad.expires_at}" min="${todayISO}" max="${maxISO}">
+              <button class="btn btn-ghost btn-small" data-action="save-ad-expires" data-id="${ad.id}">Guardar</button>
+            </div>` : ''}
           </div>
         </div>
       </div>`;
@@ -533,6 +544,29 @@ async function deleteAd(id) {
   const res  = await fetch(`/api/admin/ads/${id}`, { method: 'DELETE' });
   const data = await res.json();
   if (data.ok) { ads = ads.filter(a => a.id !== id); updateAdsCount(); renderAds(); }
+}
+
+async function featureAd(id) {
+  const res  = await fetch(`/api/admin/ads/${id}/feature`, { method: 'POST' });
+  const data = await res.json();
+  if (data.ok) { ads = ads.map(a => a.id === id ? { ...a, featured: data.featured } : a); renderAds(); }
+}
+
+async function saveAdExpires(id) {
+  const input = document.querySelector(`.ad-expires-input[data-id="${id}"]`);
+  if (!input) return;
+  const res  = await fetch(`/api/admin/ads/${id}/expires`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ expires_at: input.value }),
+  });
+  const data = await res.json();
+  if (data.ok) {
+    ads = ads.map(a => a.id === id ? { ...a, expires_at: input.value } : a);
+    renderAds();
+  } else {
+    alert(data.error || 'Error al guardar la fecha.');
+  }
 }
 
 // ─── Statistics ────────────────────────────────────────────────────────────────
@@ -723,6 +757,8 @@ document.addEventListener('click', e => {
     case 'approve-ad':       approveAd(id);          break;
     case 'reject-ad':        rejectAd(id);           break;
     case 'delete-ad':        deleteAd(id);           break;
+    case 'feature-ad':       featureAd(id);          break;
+    case 'save-ad-expires':  saveAdExpires(id);      break;
   }
 });
 

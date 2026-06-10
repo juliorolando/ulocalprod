@@ -237,10 +237,10 @@ router.get('/ticker', (req, res) => {
 // GET /api/ads  (public — activos y no vencidos)
 router.get('/ads', (req, res) => {
   const rows = getDb().prepare(`
-    SELECT id, slug, title, description, image_path, contact_info, expires_at, created_at, views
+    SELECT id, slug, title, description, image_path, contact_info, expires_at, created_at, views, featured
     FROM ads
     WHERE status = 'active' AND expires_at > date('now')
-    ORDER BY created_at DESC
+    ORDER BY featured DESC, created_at DESC
   `).all();
   res.json(rows);
 });
@@ -315,6 +315,30 @@ router.get('/admin/ads', requireAuth, (req, res) => {
 // POST /api/admin/ads/:id/approve
 router.post('/admin/ads/:id/approve', requireAuth, (req, res) => {
   getDb().prepare(`UPDATE ads SET status = 'active' WHERE id = ?`).run(req.params.id);
+  res.json({ ok: true });
+});
+
+// POST /api/admin/ads/:id/feature  (toggle destacado)
+router.post('/admin/ads/:id/feature', requireAuth, (req, res) => {
+  const db = getDb();
+  const ad = db.prepare(`SELECT featured FROM ads WHERE id = ?`).get(req.params.id);
+  if (!ad) return res.status(404).json({ error: 'No encontrado.' });
+  const next = ad.featured ? 0 : 1;
+  db.prepare(`UPDATE ads SET featured = ? WHERE id = ?`).run(next, req.params.id);
+  res.json({ ok: true, featured: next });
+});
+
+// POST /api/admin/ads/:id/expires  (cambiar vencimiento, máx 30 días desde hoy)
+router.post('/admin/ads/:id/expires', requireAuth, (req, res) => {
+  const { expires_at } = req.body;
+  if (!expires_at || !/^\d{4}-\d{2}-\d{2}$/.test(expires_at))
+    return res.status(400).json({ error: 'Fecha inválida.' });
+  const today  = new Date(); today.setHours(0,0,0,0);
+  const max    = new Date(today); max.setDate(max.getDate() + 30);
+  const target = new Date(expires_at + 'T00:00:00');
+  if (target <= today) return res.status(400).json({ error: 'La fecha debe ser futura.' });
+  if (target > max)    return res.status(400).json({ error: 'Máximo 30 días desde hoy.' });
+  getDb().prepare(`UPDATE ads SET expires_at = ? WHERE id = ?`).run(expires_at, req.params.id);
   res.json({ ok: true });
 });
 

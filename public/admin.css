@@ -542,6 +542,25 @@ body {
 .btn-success:hover { background: #1a5e35; border-color: #1a5e35; }
 .btn-danger  { background: var(--danger);  color: #fff; border-color: var(--danger); }
 .btn-danger:hover  { background: #7e1c2a; border-color: #7e1c2a; }
+.btn-star  { background: #fff8e1; color: #b8860b; border-color: #f0c040; }
+.btn-star:hover { background: #fef3c7; border-color: #d4a017; }
+
+.ad-expires-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+.ad-expires-label { font-size: 0.75rem; color: var(--text-light); white-space: nowrap; }
+.ad-expires-input {
+  font-size: 0.78rem;
+  padding: 0.25rem 0.4rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text);
+  background: var(--surface);
+}
 
 /* ── Nav badge (propuestas pendientes) ───────────────────────────────────── */
 .nav-badge {

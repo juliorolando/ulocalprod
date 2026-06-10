@@ -142,6 +142,10 @@ function initDb() {
     database.exec("ALTER TABLE ads ADD COLUMN slug TEXT NOT NULL DEFAULT ''");
     console.log('[db] Columna slug agregada a ads.');
   }
+  if (!adsInfo.find(c => c.name === 'featured')) {
+    database.exec('ALTER TABLE ads ADD COLUMN featured INTEGER DEFAULT 0');
+    console.log('[db] Columna featured agregada a ads.');
+  }
 
   // Backfill slugs for ads that don't have one yet
   const adsWithoutSlug = database.prepare("SELECT id, title FROM ads WHERE slug = ''").all();

@@ -685,6 +685,7 @@ function renderAds(ads) {
       <img src="${esc(ad.image_path)}" alt="${esc(ad.title)}" loading="lazy">
       <div class="ad-card-overlay"><span class="ad-card-title">${esc(ad.title)}</span></div>
       ${ad.views > 0 ? `<span class="ad-views-badge">${ICON.eye}${ad.views}</span>` : ''}
+      ${ad.featured    ? `<span class="ad-featured-badge">⭐</span>` : ''}
     </article>`).join('');
 
   strip.addEventListener('click', e => {
@@ -722,6 +723,7 @@ function openAd(ad) {
   document.getElementById('ad-modal-img').src     = ad.image_path;
   document.getElementById('ad-modal-img').alt     = ad.title;
   document.getElementById('ad-modal-title').textContent = ad.title;
+  document.getElementById('ad-modal-featured').classList.toggle('hidden', !ad.featured);
   document.getElementById('ad-modal-date').textContent  = timeAgo(ad.created_at);
 
   const descEl    = document.getElementById('ad-modal-desc');
