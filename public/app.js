@@ -50,10 +50,12 @@ const EMBEDDED_AD = (() => {
 })();
 
 /* ── State ─────────────────────────────────────────────────────────────────── */
-let allBusinesses   = [];
-let activeCategory  = '';
-let searchQuery     = '';
-let displayedCount  = PAGE_SIZE;
+let allBusinesses    = [];
+let shuffledOrder    = [];
+let activeCategory   = '';
+let searchQuery      = '';
+let displayedCount   = PAGE_SIZE;
+let activeSort       = 'recent';
 let currentDetailBiz = null;
 
 /* ── Utils ─────────────────────────────────────────────────────────────────── */
@@ -340,6 +342,15 @@ function cardHTML(b) {
     </article>`;
 }
 
+/* ── Sort helpers ───────────────────────────────────────────────────────────── */
+function getSortedBase() {
+  if (activeSort === 'random')  return shuffledOrder;
+  if (activeSort === 'recent')  return [...allBusinesses].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  if (activeSort === 'views')   return [...allBusinesses].sort((a, b) => (b.views || 0) - (a.views || 0));
+  if (activeSort === 'az')      return [...allBusinesses].sort((a, b) => a.name.localeCompare(b.name, 'es', { sensitivity: 'base' }));
+  return shuffledOrder;
+}
+
 /* ── Main render ────────────────────────────────────────────────────────────── */
 function render() {
   const q  = searchQuery.toLowerCase().trim();
@@ -352,7 +363,7 @@ function render() {
     return nameN.includes(qN) || catsN.some(c => c.includes(qN)) || addrN.includes(qN);
   };
 
-  let filtered = allBusinesses.filter(b => {
+  let filtered = getSortedBase().filter(b => {
     if (!(!activeCategory || b.categories.includes(activeCategory))) return false;
     return !q || exactMatch(b);
   });
@@ -441,7 +452,11 @@ function openDetailBiz(b, pushUrl = true) {
 
 function openDetail(id) {
   const b = allBusinesses.find(x => x.id === id);
-  if (b) openDetailBiz(b, true);
+  if (!b) return;
+  openDetailBiz(b, true);
+  fetch(`/api/businesses/${id}/view`, { method: 'POST' }).then(() => {
+    b.views = (b.views || 0) + 1;
+  }).catch(() => {});
 }
 
 function closeDetail(silent = false) {
@@ -675,6 +690,13 @@ function filterCategoryPills(q) {
     btn.hidden = qN.length > 0 && !catN.includes(qN);
   });
 }
+
+/* ── Sort select ────────────────────────────────────────────────────────────── */
+document.getElementById('sort-select').addEventListener('change', e => {
+  activeSort     = e.target.value;
+  displayedCount = PAGE_SIZE;
+  render();
+});
 
 /* ── Search ─────────────────────────────────────────────────────────────────── */
 const searchInput    = document.getElementById('search');
@@ -982,7 +1004,8 @@ async function init() {
     fetch('/api/ticker').then(r => r.json()).catch(() => []),
   ]);
 
-  allBusinesses = sortByRichness(shuffle(businesses));
+  allBusinesses = businesses;
+  shuffledOrder = sortByRichness(shuffle(businesses));
   renderCategories(shuffle(categories));
   renderAds(ads);
   renderTicker(ticker);

@@ -24,7 +24,7 @@ router.get('/', (req, res, next) => {
     const db = getDb();
 
     const businesses = db.prepare(`
-      SELECT b.id, b.name, b.address, b.phone, b.website, b.description, b.slug,
+      SELECT b.id, b.name, b.address, b.phone, b.website, b.description, b.slug, b.created_at, b.views,
              GROUP_CONCAT(bc.category, '|') AS categories
       FROM businesses b
       LEFT JOIN business_categories bc ON bc.business_id = b.id

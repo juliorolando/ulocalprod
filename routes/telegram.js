@@ -1,15 +1,15 @@
 const express                          = require('express');
 const router                           = express.Router();
-const { getDb }                        = require('../db');
+const { getDb, ensureUniqueSlug }      = require('../db');
 const { editMessage, editCaption, answerCallback, SECRET } = require('../lib/telegram');
 
 async function handleCallback(cb) {
-  const parts  = (cb.data || '').split('_');          // ['approve', 'ad'|'proposal'|'report', id]
+  const parts  = (cb.data || '').split('_');          // ['approve'|'publish', 'ad'|'proposal'|'report', id]
   const action = parts[0];
   const type   = parts[1];
   const id     = parseInt(parts[2], 10);
 
-  if (action !== 'approve' || !type || !Number.isInteger(id) || id <= 0) return;
+  if (!['approve','publish'].includes(action) || !type || !Number.isInteger(id) || id <= 0) return;
 
   const db          = getDb();
   const msgId       = cb.message?.message_id;
@@ -28,13 +28,33 @@ async function handleCallback(cb) {
       else         await editMessage(msgId, originalText + approved);
     }
 
-  } else if (type === 'proposal') {
+  } else if (type === 'proposal' && action === 'approve') {
     const row = db.prepare('SELECT status FROM proposals WHERE id = ?').get(id);
     if (!row)                      { await answerCallback(cb.id, '❌ Propuesta no encontrada'); return; }
     if (row.status === 'reviewed') { await answerCallback(cb.id, 'Ya estaba revisada');         return; }
+    if (row.status === 'approved') { await answerCallback(cb.id, 'Ya estaba aprobada');         return; }
     db.prepare("UPDATE proposals SET status = 'reviewed' WHERE id = ?").run(id);
-    await answerCallback(cb.id, '✅ Propuesta marcada como revisada');
-    if (msgId) await editMessage(msgId, originalText + '\n\n✅ <b>Revisada</b>');
+    await answerCallback(cb.id, '👀 Propuesta marcada como revisada');
+    if (msgId) await editMessage(msgId, originalText + '\n\n👀 <b>Revisada — pendiente de aprobación en el panel</b>');
+
+  } else if (type === 'proposal' && action === 'publish') {
+    const proposal = db.prepare('SELECT * FROM proposals WHERE id = ?').get(id);
+    if (!proposal)                        { await answerCallback(cb.id, '❌ Propuesta no encontrada'); return; }
+    if (proposal.status === 'approved')   { await answerCallback(cb.id, 'Ya estaba aprobada');         return; }
+    const slug = ensureUniqueSlug(db, proposal.name);
+    const { lastInsertRowid: bizId } = db.prepare(`
+      INSERT INTO businesses (name, address, phone, website, description, is_active, slug)
+      VALUES (@name, @address, @phone, @website, @description, 1, @slug)
+    `).run({ ...proposal, slug });
+    if (proposal.categories) {
+      const insertCat = db.prepare('INSERT OR IGNORE INTO business_categories (business_id, category) VALUES (?, ?)');
+      for (const cat of proposal.categories.split(',')) {
+        if (cat.trim()) insertCat.run(bizId, cat.trim());
+      }
+    }
+    db.prepare("UPDATE proposals SET status = 'approved' WHERE id = ?").run(id);
+    await answerCallback(cb.id, '✅ Negocio publicado en el directorio');
+    if (msgId) await editMessage(msgId, originalText + '\n\n✅ <b>Aprobado y publicado en el directorio</b>');
 
   } else if (type === 'report') {
     const row = db.prepare('SELECT status FROM reports WHERE id = ?').get(id);

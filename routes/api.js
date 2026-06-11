@@ -54,7 +54,7 @@ function requireAuth(req, res, next) {
 router.get('/businesses', (req, res) => {
   const rows = getDb().prepare(`
     SELECT
-      b.id, b.name, b.address, b.phone, b.website, b.description, b.slug,
+      b.id, b.name, b.address, b.phone, b.website, b.description, b.slug, b.created_at, b.views,
       GROUP_CONCAT(bc.category, '|') as categories
     FROM businesses b
     LEFT JOIN business_categories bc ON bc.business_id = b.id
@@ -64,6 +64,12 @@ router.get('/businesses', (req, res) => {
   `).all();
 
   res.json(rows.map(b => ({ ...b, categories: b.categories ? b.categories.split('|') : [] })));
+});
+
+// POST /api/businesses/:id/view
+router.post('/businesses/:id/view', (req, res) => {
+  getDb().prepare('UPDATE businesses SET views = views + 1 WHERE id = ? AND is_active = 1').run(req.params.id);
+  res.json({ ok: true });
 });
 
 // GET /api/categories
@@ -199,7 +205,10 @@ router.post('/propose', (req, res) => {
     (address      ? `<b>Dirección:</b> ${address.trim()}\n`  : '') +
     (contact_name ? `<b>Quien escribe:</b> ${contact_name.trim()}\n` : '') +
     `<b>Contacto:</b> ${contact_info.trim()}`,
-    [[{ text: '✅ Marcar revisada', callback_data: `approve_proposal_${proposalId}` }]]
+    [[
+      { text: '👀 Marcar revisada', callback_data: `approve_proposal_${proposalId}` },
+      { text: '✅ Aprobar negocio',  callback_data: `publish_proposal_${proposalId}` }
+    ]]
   );
 
   res.json({ ok: true });
@@ -494,10 +503,10 @@ router.delete('/admin/reports/:id', requireAuth, (req, res) => {
 
 // GET /api/admin/proposals
 router.get('/admin/proposals', requireAuth, (req, res) => {
-  const status = req.query.status || 'pending';
-  const rows = getDb().prepare(
-    `SELECT * FROM proposals WHERE status = ? ORDER BY created_at DESC`
-  ).all(status);
+  const status = req.query.status;
+  const rows = status
+    ? getDb().prepare(`SELECT * FROM proposals WHERE status = ? ORDER BY created_at DESC`).all(status)
+    : getDb().prepare(`SELECT * FROM proposals WHERE status IN ('pending','reviewed') ORDER BY created_at DESC`).all();
   res.json(rows);
 });
 

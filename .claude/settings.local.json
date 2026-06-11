@@ -8,7 +8,10 @@
       "Bash(curl -sI http://localhost:3001/)",
       "Bash(node *)",
       "PowerShell(Add-Type -AssemblyName System.Drawing; $ico = [System.Drawing.Icon]::new\\(\"C:\\\\Users\\\\NetCell\\\\Desktop\\\\Nevado LAB\\\\Code Vibing Factory\\\\monopolioushuaialocal\\\\favicon.ico\"\\); \"ICO Size: $\\($ico.Width\\)x$\\($ico.Height\\)\"; $ico.Dispose\\(\\))",
-      "PowerShell(Add-Type -AssemblyName System.Drawing; $png = [System.Drawing.Image]::FromFile\\(\"C:\\\\Users\\\\NetCell\\\\Desktop\\\\Nevado LAB\\\\Code Vibing Factory\\\\monopolioushuaialocal\\\\ulocal.png\"\\); \"PNG Size: $\\($png.Width\\)x$\\($png.Height\\)\"; $png.Dispose\\(\\))"
+      "PowerShell(Add-Type -AssemblyName System.Drawing; $png = [System.Drawing.Image]::FromFile\\(\"C:\\\\Users\\\\NetCell\\\\Desktop\\\\Nevado LAB\\\\Code Vibing Factory\\\\monopolioushuaialocal\\\\ulocal.png\"\\); \"PNG Size: $\\($png.Width\\)x$\\($png.Height\\)\"; $png.Dispose\\(\\))",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\NetCell\\\\Desktop\\\\Nevado LAB\\\\Code Vibing Factory\\\\monopolioushuaialocal\" -Recurse -File -Force)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "PowerShell(head *)"
     ]
   }
 }
