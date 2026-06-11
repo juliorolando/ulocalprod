@@ -55,7 +55,7 @@ let shuffledOrder    = [];
 let activeCategory   = '';
 let searchQuery      = '';
 let displayedCount   = PAGE_SIZE;
-let activeSort       = 'recent';
+let activeSort       = 'random';
 let currentDetailBiz = null;
 
 /* ── Utils ─────────────────────────────────────────────────────────────────── */
