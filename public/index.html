@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/style.css?v=__VHASH__">
   <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
   <!-- Open Graph -->
@@ -72,7 +72,11 @@
       <span class="ads-label">Comunidad Ushuaia</span>
       <button class="ads-pub-btn" id="ads-pub-btn">+ Publicar</button>
     </div>
-    <div class="ads-strip container-wide" id="ads-strip" role="list"></div>
+    <div class="ads-strip-wrap">
+      <button class="ads-nav ads-nav--prev" id="ads-nav-prev" aria-label="Anteriores" hidden>‹</button>
+      <div class="ads-strip container-wide" id="ads-strip" role="list"></div>
+      <button class="ads-nav ads-nav--next" id="ads-nav-next" aria-label="Siguientes">›</button>
+    </div>
   </section>
 
   <div class="cat-bar">
@@ -86,7 +90,7 @@
   <div class="sort-bar">
     <select id="sort-select" class="sort-select" aria-label="Ordenar directorio">
       <option value="random">Al azar</option>
-      <option value="recent">Más recientes</option>
+      <option value="recent" selected>Más recientes</option>
       <option value="views">Más vistos</option>
       <option value="az">A — Z</option>
     </select>
@@ -194,7 +198,7 @@
       <div class="pmodal-body">
         <div id="propose-success" class="pmodal-success hidden">
           <div class="pmodal-success-icon">✓</div>
-          <p><strong>¡Propuesta enviada!</strong><br>Si esta todo ok, la publicaremos y te contactaremos a la brevedad.</p>
+          <p><strong>¡Propuesta enviada!</strong><br>Si esta todo ok, se aprueba en aprox. 15 minutos.</p>
         </div>
         <form id="propose-form">
           <p class="free-badge">✓ Totalmente gratis</p>
@@ -205,7 +209,7 @@
           </div>
           <div class="form-group">
             <label class="form-label" for="p-categories">Rubro / categoría <span class="form-hint">(separados por coma)</span></label>
-            <input type="text" id="p-categories" class="form-input" maxlength="200" placeholder="Ej: Restaurante, Parrilla">
+            <input type="text" id="p-categories" class="form-input" maxlength="200" placeholder="Ej: , Parrilla">
           </div>
           <div class="form-group">
             <label class="form-label" for="p-address">Dirección</label>
@@ -361,6 +365,6 @@
     </div>
   </div>
 
-  <script defer src="/app.js"></script>
+  <script defer src="/app.js?v=__VHASH__"></script>
 </body>
 </html>

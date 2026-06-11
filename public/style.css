@@ -254,6 +254,36 @@ body {
   .cat-nav[hidden] { display: none !important; }
 }
 
+/* ── Ads nav arrows ──────────────────────────────────────────────────────── */
+.ads-strip-wrap {
+  position: relative;
+}
+.ads-nav {
+  display: none;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+  color: var(--text-sub);
+  font-size: 1rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+.ads-nav:hover { background: var(--bg); color: var(--primary); }
+.ads-nav--prev { left: 6px; }
+.ads-nav--next { right: 6px; }
+@media (hover: hover) {
+  .ads-nav { display: flex; }
+  .ads-nav[hidden] { display: none !important; }
+}
+
 
 .cat-pill {
   flex-shrink: 0;
@@ -308,9 +338,9 @@ body {
 
 /* ── Sort bar ────────────────────────────────────────────────────────────── */
 .sort-bar {
-  max-width: var(--content-w);
+  max-width: 1200px;
   margin: 0.5rem auto 0;
-  padding: 0 1rem;
+  padding: 0 1.25rem;
   display: flex;
   justify-content: flex-end;
 }
@@ -1046,8 +1076,8 @@ body {
 }
 .ad-hoy-badge {
   position: absolute;
-  bottom: 0.4rem;
-  left: 0.4rem;
+  top: 0.4rem;
+  right: 0.4rem;
   font-size: 0.6rem;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -1076,11 +1106,7 @@ body {
   bottom: 0; left: 0; right: 0;
   background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%);
   padding: 1.5rem 0.5rem 0.45rem;
-  opacity: 0;
-  transition: opacity 0.2s;
 }
-.ad-card:hover .ad-card-overlay,
-.ad-card:focus .ad-card-overlay { opacity: 1; }
 .ad-card-title {
   font-size: 0.68rem;
   font-weight: 600;

@@ -5,7 +5,16 @@ const compression  = require('compression');
 const helmet       = require('helmet');
 const rateLimit    = require('express-rate-limit');
 const path         = require('path');
+const fs           = require('fs');
+const { execSync } = require('child_process');
 const { initDb }   = require('./db');
+
+const GIT_HASH = (() => {
+  try { return execSync('git rev-parse --short HEAD').toString().trim(); }
+  catch { return Date.now().toString(36); }
+})();
+const INDEX_HTML = fs.readFileSync(path.join(__dirname, 'public', 'index.html'), 'utf8')
+  .replace(/__VHASH__/g, GIT_HASH);
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -95,6 +104,13 @@ app.use('/anuncio', require('./routes/anuncio'));
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads'), {
   maxAge: PROD ? '1d' : 0,
 }));
+
+// Sirve index.html con el hash de versión inyectado
+app.get('/', (req, res) => {
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.send(INDEX_HTML);
+});
 
 // Archivos estáticos con cache agresivo en assets, sin cache en HTML
 app.use(express.static(path.join(__dirname, 'public'), {

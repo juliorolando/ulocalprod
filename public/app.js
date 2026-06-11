@@ -55,7 +55,7 @@ let shuffledOrder    = [];
 let activeCategory   = '';
 let searchQuery      = '';
 let displayedCount   = PAGE_SIZE;
-let activeSort       = 'random';
+let activeSort       = 'recent';
 let currentDetailBiz = null;
 
 /* ── Utils ─────────────────────────────────────────────────────────────────── */
@@ -273,6 +273,23 @@ function _initCatNav(strip) {
 
   prev.addEventListener('click', () => strip.scrollBy({ left: -220, behavior: 'smooth' }));
   next.addEventListener('click', () => strip.scrollBy({ left:  220, behavior: 'smooth' }));
+  strip.addEventListener('scroll', update, { passive: true });
+  update();
+}
+
+function _initAdsNav() {
+  const strip = document.getElementById('ads-strip');
+  const prev  = document.getElementById('ads-nav-prev');
+  const next  = document.getElementById('ads-nav-next');
+  if (!strip || !prev || !next) return;
+
+  function update() {
+    prev.hidden = strip.scrollLeft <= 2;
+    next.hidden = strip.scrollLeft + strip.clientWidth >= strip.scrollWidth - 2;
+  }
+
+  prev.addEventListener('click', () => strip.scrollBy({ left: -280, behavior: 'smooth' }));
+  next.addEventListener('click', () => strip.scrollBy({ left:  280, behavior: 'smooth' }));
   strip.addEventListener('scroll', update, { passive: true });
   update();
 }
@@ -1017,6 +1034,7 @@ async function init() {
   shuffledOrder = sortByRichness(shuffle(businesses));
   renderCategories(shuffle(categories));
   renderAds(ads);
+  _initAdsNav();
   renderTicker(ticker);
 
   const skeleton = document.getElementById('skeleton');
