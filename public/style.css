@@ -951,6 +951,16 @@ body {
 /* ── Ads strip ───────────────────────────────────────────────────────────── */
 .ads-section {
   padding: 1rem 0 0.5rem;
+  position: relative;
+}
+.ads-section::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0; bottom: 0;
+  width: 2.5rem;
+  background: linear-gradient(to right, transparent, var(--bg));
+  pointer-events: none;
+  z-index: 1;
 }
 .ads-header {
   display: flex;
@@ -965,6 +975,20 @@ body {
   letter-spacing: 0.06em;
   color: var(--text-muted);
 }
+.ads-pub-btn {
+  font-size: 0.72rem;
+  font-weight: 600;
+  font-family: var(--font);
+  color: var(--primary);
+  background: none;
+  border: 1.5px solid var(--primary);
+  border-radius: var(--radius-pill);
+  padding: 0.25rem 0.7rem;
+  cursor: pointer;
+  line-height: 1;
+  transition: background var(--transition), color var(--transition);
+}
+.ads-pub-btn:hover { background: var(--primary); color: #fff; }
 
 .ads-strip {
   display: flex;
@@ -1018,6 +1042,20 @@ body {
   font-size: 0.85rem;
   line-height: 1;
   filter: drop-shadow(0 1px 3px rgba(0,0,0,0.5));
+  pointer-events: none;
+}
+.ad-hoy-badge {
+  position: absolute;
+  bottom: 0.4rem;
+  left: 0.4rem;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--primary);
+  padding: 0.18rem 0.45rem;
+  border-radius: 999px;
   pointer-events: none;
 }
 

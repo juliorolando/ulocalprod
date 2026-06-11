@@ -512,6 +512,10 @@ document.getElementById('chooser-go-anuncio').addEventListener('click', () => {
   openProposeAd();
   window.umami?.track('sumar-anuncio');
 });
+document.getElementById('ads-pub-btn').addEventListener('click', () => {
+  openProposeAd();
+  window.umami?.track('sumar-anuncio-header');
+});
 
 /* ── Propose modal ──────────────────────────────────────────────────────────── */
 function openPropose() {
@@ -727,13 +731,18 @@ function renderAds(ads) {
   const section = document.getElementById('ads-section');
   const strip   = document.getElementById('ads-strip');
   section.classList.remove('hidden');
-  strip.innerHTML = ads.map(ad => `
+  const now = Date.now();
+  strip.innerHTML = ads.map(ad => {
+    const isNew = ad.created_at && (now - new Date(ad.created_at).getTime()) < 24 * 60 * 60 * 1000;
+    return `
     <article class="ad-card" data-id="${ad.id}" role="listitem" tabindex="0" aria-label="${esc(ad.title)}">
       <img src="${esc(ad.image_path)}" alt="${esc(ad.title)}" loading="lazy">
       <div class="ad-card-overlay"><span class="ad-card-title">${esc(ad.title)}</span></div>
       ${ad.views >= 50 ? `<span class="ad-views-badge">${ICON.eye}${ad.views}</span>` : ''}
       ${ad.featured    ? `<span class="ad-featured-badge">⭐</span>` : ''}
-    </article>`).join('');
+      ${isNew          ? `<span class="ad-hoy-badge">HOY</span>` : ''}
+    </article>`;
+  }).join('');
 
   strip.addEventListener('click', e => {
     const card = e.target.closest('.ad-card');
